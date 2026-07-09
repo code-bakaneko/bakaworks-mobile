@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 export default function AdminPage() {
@@ -21,6 +22,7 @@ export default function AdminPage() {
             category_id: "0",
             title: "Japanese",
             blurb: "Learn Japanese like a native",
+            icon: "🇯🇵",
             sort: "10"
             
         },
@@ -29,6 +31,7 @@ export default function AdminPage() {
             category_id: "1",
             title: "HTML",
             blurb: "Learn the basics of structuring web pages with HTML",
+            icon: "🤖",
             sort: "10"
         },
         {
@@ -36,6 +39,7 @@ export default function AdminPage() {
             category_id: "1",
             title: "CSS",
             blurb: "Learn the basics of structuring web pages with HTML",
+            icon: "🤖",
             sort: "10"
         },
         {
@@ -43,6 +47,7 @@ export default function AdminPage() {
             category_id: "1",
             title: "JavaScript",
             blurb: "Learn the basics of structuring web pages with HTML",
+            icon: "🤖",
             sort: "10"
         }
     ]
@@ -61,13 +66,18 @@ export default function AdminPage() {
                                 <Link key={course.id}
                                     href={`/admin`}
                                     className="
+                                    flex flex-col items-center justify-center gap-4
                                     aspect-square p-4
                                     bg-brand
-                                    border-b-6 border-brand-dark rounded-sm
+                                    border-b-8 border-brand-dark rounded-sm
                                     cursor-pointer
                                     hover:border-b-0 hover:translate-y-0.5
                                     transition-all">
-                                    {course.title}
+                                    <span
+                                        className="text-5xl">
+                                        {course.icon}
+                                    </span>
+                                    <p>{course.title}</p>
                                 </Link>
                             ))}
                         </div>
