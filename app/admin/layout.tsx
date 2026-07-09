@@ -1,4 +1,4 @@
-import Sidebar from "./sidebar";
+import AdminSidebar from "./sidebar";
 
 export default function AdminLayout({
     children,
@@ -7,9 +7,9 @@ export default function AdminLayout({
 }>) {
     return (
         <div
-            className="h-full flex">
-            <Sidebar/>
-            {children}
+            className="min-h-screen flex">
+            <AdminSidebar/>
+            <main className="flex-1">{children}</main>
         </div>
     );
 }

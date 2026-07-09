@@ -1,19 +1,39 @@
 import Link from "next/link";
 
-export default function Sidebar() {
+export default function AdminSidebar() {
     const navButtons = [
+        {
+            icon: "📚",
+            name: "Category",
+            url: "/admin/categories"
+        },
         {
             icon: "📚",
             name: "Courses",
             url: "/admin/courses"
-        }
+        },
+        {
+            icon: "📚",
+            name: "Units",
+            url: "/admin/courses"
+        },
+        {
+            icon: "📚",
+            name: "Lessons",
+            url: "/admin/courses"
+        },
+        {
+            icon: "📚",
+            name: "Quizzes",
+            url: "/admin/courses"
+        },
     ]
     return (
         <div
             className="
             h-screen p-2 overflow-y-auto
             bg-slate-950
-            flex flex-col items-center justify-start">
+            flex flex-col items-center justify-start gap-2">
             {navButtons.map((button) => (
                 <Link 
                 key={button.name}
@@ -21,8 +41,7 @@ export default function Sidebar() {
                 className="
                 flex flex-col items-center justify-center
                 px-2 py-1 rounded-sm
-                bg-brand
-                border-b-4 border-brand-dark
+                border-b-4 border-white/10
                 cursor-pointer
                 hover:border-b-0 hover:translate-y-1
                 transition-all">
