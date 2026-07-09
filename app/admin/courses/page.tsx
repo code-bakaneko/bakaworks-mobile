@@ -69,9 +69,9 @@ export default function AdminPage() {
                                     flex flex-col items-center justify-center gap-4
                                     aspect-square p-4
                                     bg-brand
-                                    border-b-8 border-brand-dark rounded-sm
+                                    border-b-4 border-brand-dark rounded-sm
                                     cursor-pointer
-                                    hover:border-b-0 hover:translate-y-0.5
+                                    hover:border-b-0 hover:translate-y-1
                                     transition-all">
                                     <span
                                         className="text-5xl">
