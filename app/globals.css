@@ -17,3 +17,34 @@
   --brand-dark: #1d4ed8;
   --muted: #94a3b8;
 }
+
+.scene {
+  perspective: 500px;
+}
+
+.card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+
+.card-inner.flip {
+  transform: rotateY(180deg);
+}
+
+.back-face {
+  position: absolute;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+.front-face {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.front-face, .back-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

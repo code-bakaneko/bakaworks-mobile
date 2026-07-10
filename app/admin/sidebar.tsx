@@ -19,14 +19,25 @@ export default function AdminSidebar() {
         },
         {
             icon: "📚",
+            name: "Quizzes",
+            url: "/admin/courses"
+        },
+        
+        {
+            icon: "📚",
             name: "Lessons",
             url: "/admin/courses"
         },
         {
             icon: "📚",
-            name: "Quizzes",
-            url: "/admin/courses"
+            name: "Questions",
+            url: "/admin/questions"
         },
+        {
+            icon: "📚",
+            name: "Vocabulary",
+            url: "/admin/vocabulary"
+        }
     ]
     return (
         <div
