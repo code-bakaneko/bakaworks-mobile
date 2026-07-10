@@ -1,6 +1,11 @@
-import FlashCard from "../../../public/components/flashcard"
+import FlashCard from "../../components/flashcard"
 
 export default function AdminFlashCardPage() {
+
+    async function addVocabularyWord(formData: FormData) {
+        "use server"
+
+    }
     const dummyFlashCards = [
         {
             id: 0,
@@ -26,6 +31,11 @@ export default function AdminFlashCardPage() {
 
     return(
         <div>
+            <form action={addVocabularyWord}>
+                <input name="english-word" placeholder="english word"/>
+                <input name="japanese-word" placeholder="Japanese word"/>
+                <button type="submit">Add Word</button>
+            </form>
             <FlashCard/>
             <div>
                 <button>Incorrect</button>
