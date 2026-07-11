@@ -26,7 +26,7 @@ export default async function AdminFlashCardPage() {
         revalidatePath("/admin/vocabulary")
     }
 
-    const { data: vocabData, error } = await supabaseAdmin.from("language_vocabulary").select();
+    const { data: vocabData } = await supabaseAdmin.from("language_vocabulary").select();
 
     return(
         <div
@@ -55,11 +55,8 @@ export default async function AdminFlashCardPage() {
             </div>
             <div
                 className="flex-1">
-                <FlashCard/>
-                <div>
-                    <button>Incorrect</button>
-                    <button>Correct</button>
-                </div>
+                <FlashCard
+                    words={vocabData? vocabData : []}/>
                 <div>
                     <table>
                         <thead>
