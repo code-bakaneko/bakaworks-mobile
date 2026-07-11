@@ -1,3 +1,4 @@
+import Link from "next/link";
 import FlashCard from "./components/flashcard";
 import { createClient } from "./lib/supabase/server";
 
@@ -6,11 +7,11 @@ export default async function Home() {
   const { data: vocabWords } = await supabase.from("language_vocabulary").select();
   return (
     <div
-      className="flex flex-col gap-10 h-screen">
+      className="flex flex-col gap-10 h-screen items-center">
         <header className="w-full bg-slate-950 h-10 flex items-center justify-center">
           BakaWorks BETA - Public Access
         </header>
-        <main className="flex-1 flex justify-center gap-10 px-20">
+        <main className="flex-1 flex gap-10 px-20 w-full">
           <aside className="flex flex-col items-start justify-start">
             <p>Upcoming Updates:</p>
             <ol className="list-decimal">
@@ -34,9 +35,10 @@ export default async function Home() {
             />
           </div>
         </main>
-        <footer className="bg-slate-500 h-20 flex flex-col">
-          {/*Advertisement */}
-          <p>Advertisment</p>
+        <footer className="h-20 flex flex-col w-full items-center justify-center">
+            <a href="https://www.youtube.com/@BakaWorks">
+              <img src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/video.png" className="h-14"/>
+            </a>
         </footer>
     </div>
   );
