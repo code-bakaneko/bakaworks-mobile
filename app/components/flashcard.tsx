@@ -33,9 +33,9 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
     }
 
     return(
-            <div>
+            <div className="w-96 h-128 flex flex-col">
                 <span>{`Round: ${round}`}</span>
-                <div className="scene w-96 h-128">
+                <div className="scene w-full h-full">
                     <div className={`${flipped? "flip":""} card-inner w-full h-full bg-slate-950 p-2 
                         border border-brand rounded-sm
                         hover:cursor-pointer`}
