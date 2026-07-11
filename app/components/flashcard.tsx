@@ -14,19 +14,24 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
 
     function next() {
         setFlipped(false);
-        if(index === limit) {
-            setIndex(0);
-            setLimit(limit => limit + 2);
+        if (index === words.length){
+            setIndex(0)
         } else {
-            setIndex(index => index + 1);
+            if(index === limit) {
+                setIndex(0);
+                setLimit(limit => limit + 2);
+            } else {
+                setIndex(index => index + 1);
+            }
         }
     }
 
     return(
             <div>
                 <div className="scene w-48 h-64">
-                    <div className={`${flipped? "flip":""} card-inner w-full h-full bg-slate-500`}
+                    <div className={`${flipped? "flip":""} card-inner w-full h-full bg-slate-500 p-2`}
                         onClick={() => setFlipped(flip => !flip)}>
+                        <span>{`${index}/${words.length}`}</span>
                         <div
                             className="
                             flex flex-col
