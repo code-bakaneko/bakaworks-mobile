@@ -19,7 +19,7 @@
 }
 
 .scene {
-  perspective: 500px;
+  perspective: 1000px;
 }
 
 .card-inner {
