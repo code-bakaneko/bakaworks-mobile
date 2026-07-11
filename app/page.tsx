@@ -35,9 +35,12 @@ export default async function Home() {
             />
           </div>
         </main>
-        <footer className="h-20 flex flex-col w-full items-center justify-center">
+        <footer className="h-20 flex gap-10 w-full items-center justify-center border-t-4 border-white/10">
             <a href="https://www.youtube.com/@BakaWorks">
               <img src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/video.png" className="h-14"/>
+            </a>
+            <a href="https://x.com/bakaworkz" className="hover:bg-white">
+              <img src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/twitter.png" className="h-14"/>
             </a>
         </footer>
     </div>
