@@ -10,10 +10,16 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
     }
     const [flipped, setFlipped] = useState(false);
     const [index, setIndex] = useState(0);
+    const [limit, setLimit] = useState(2);
 
     function next() {
         setFlipped(false);
-        setIndex(index => index + 1);
+        if(index === limit) {
+            setIndex(0);
+            setLimit(limit => limit + 2);
+        } else {
+            setIndex(index => index + 1);
+        }
     }
 
     return(
