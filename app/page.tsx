@@ -8,8 +8,13 @@ export default async function Home() {
   return (
     <div
       className="flex flex-col gap-10 h-screen items-center">
-        <header className="w-full bg-slate-950 h-10 flex items-center justify-center">
-          BakaWorks BETA - Public Access
+        <header className="w-full bg-slate-950 h-20 flex items-center justify-between px-10">
+          <span>BakaWorks BETA - Public Access</span>
+          <button className="
+          bg-brand h-10 px-4 py-2 rounded-sm font-extrabold border-b-4 border-brand-dark
+          hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer">
+            Log In
+          </button>
         </header>
         <main className="flex-1 flex gap-10 px-20 w-full">
           <aside className="flex flex-col items-start justify-start">

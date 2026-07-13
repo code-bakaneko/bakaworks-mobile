@@ -7,7 +7,7 @@ type Vocab = Tables<"language_vocabulary">;
 export default function FlashCard({ words }: { words: Vocab[] }) {
     const [flipped, setFlipped] = useState(false);
     const [index, setIndex] = useState(0);
-    const [limit, setLimit] = useState(2);
+    const [limit, setLimit] = useState(() => Math.min(2, words.length - 1));
     const [round, setRound] = useState(1);
 
     if (words.length === 0) {
