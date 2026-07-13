@@ -16,29 +16,35 @@ export default async function Home() {
             Log In
           </button>
         </header>
-        <main className="flex-1 flex gap-10 px-20 w-full">
-          <aside className="flex flex-col items-start justify-start">
-            <p>Upcoming Updates:</p>
-            <ol className="list-decimal">
-              <li>Add correct and incorrect flash card tracking</li>
-              <li>Expand Flash Card Vocabulary Listing</li>
-              <li>Multiple choice questions</li>
-              <li>Flash Card Sets</li>
-            </ol>
-          </aside>
-          <div className="flex-1 flex flex-col items-center">
-            <div className="p-2">
-              <p>Instructions:</p>
+        <main className="flex-1 flex flex-col gap-10 px-20 w-full">
+          <span>Scroll Down To Access Test Features</span>
+          <section className="flex">
+            <aside className="flex flex-col items-start justify-start">
+              <p>Upcoming Updates:</p>
               <ol className="list-decimal">
-                <li>Guess/remember the translation</li>
-                <li>Click the card to flip</li>
-                <li>Answer correct if you got the translation correct</li>
+                <li>Add correct and incorrect flash card tracking</li>
+                <li>Expand Flash Card Vocabulary Listing</li>
+                <li>Multiple choice questions</li>
+                <li>Flash Card Sets</li>
               </ol>
+            </aside>
+            <div className="flex-1 flex flex-col items-center">
+              <div className="p-2">
+                <p>Instructions:</p>
+                <ol className="list-decimal">
+                  <li>Guess/remember the translation</li>
+                  <li>Click the card to flip</li>
+                  <li>Answer correct if you got the translation correct</li>
+                </ol>
+              </div>
+              <FlashCard
+                words={vocabWords? vocabWords : []}
+              />
             </div>
-            <FlashCard
-              words={vocabWords? vocabWords : []}
-            />
-          </div>
+          </section>
+          <section>
+            {/*Home Page Expandsion Goes here */}
+          </section>
         </main>
         <footer className="h-20 flex gap-10 w-full items-center justify-center border-t-4 border-white/10">
             <a href="https://www.youtube.com/@BakaWorks">
