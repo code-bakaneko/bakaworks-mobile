@@ -1,6 +1,7 @@
 import Link from "next/link";
 import FlashCard from "./components/flashcard";
 import { createClient } from "./lib/supabase/server";
+import MultipleChoice from "./components/multiplechoice";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -22,7 +23,6 @@ export default async function Home() {
             <aside className="flex flex-col items-start justify-start">
               <p>Upcoming Updates:</p>
               <ol className="list-decimal">
-                <li>Expand Flash Card Vocabulary Listing</li>
                 <li>Multiple choice questions</li>
                 <li>Flash Card Sets</li>
               </ol>
@@ -42,7 +42,9 @@ export default async function Home() {
             </div> 
           </section>
           <section>
-            {/*Home Page Expandsion Goes here */}
+            <MultipleChoice
+              words={vocabWords? vocabWords : []}
+            />
           </section>
         </main>
         <footer className="h-20 flex gap-10 w-full items-center justify-center border-t-4 border-white/10">

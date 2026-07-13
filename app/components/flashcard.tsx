@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react";
 import { Tables } from "@/app/lib/database.types"
-import { setupFsCheck } from "next/dist/server/lib/router-utils/filesystem";
 
 type Vocab = Tables<"language_vocabulary">;
 
