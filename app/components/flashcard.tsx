@@ -5,31 +5,32 @@ import { Tables } from "@/app/lib/database.types"
 type Vocab = Tables<"language_vocabulary">;
 
 export default function FlashCard({ words }: { words: Vocab[] }) {
-    if (words.length === 0) {
-        return <div>No Words Yet</div>
-    }
     const [flipped, setFlipped] = useState(false);
     const [index, setIndex] = useState(0);
     const [limit, setLimit] = useState(2);
     const [round, setRound] = useState(1);
 
+    if (words.length === 0) {
+        return <div>No Words Yet</div>
+    }
+
     function next() {
         setFlipped(false);
-        if (index === words.length){
-            setIndex(0)
+        
+        if ( index === limit) {
+            setIndex(0);
             setRound(round => round + 1)
-        } else {
-            if(index === limit) {
-                setIndex(0);
-                setRound(round => round + 1)
-                setLimit(limit => limit + 2);
-                if (limit >= words.length) {
-                    setLimit(words.length)
+            if (limit < words.length - 1) {
+                if(limit + 2 > words.length - 1) {
+                    setLimit(words.length - 1)
+                } else {
+                    setLimit(limit => limit + 2)
                 }
-            } else {
-                setIndex(index => index + 1);
             }
+        } else {
+            setIndex(index => index + 1)
         }
+
     }
 
     return(
