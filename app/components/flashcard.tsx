@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react";
 import { Tables } from "@/app/lib/database.types"
+import { setupFsCheck } from "next/dist/server/lib/router-utils/filesystem";
 
 type Vocab = Tables<"language_vocabulary">;
 
@@ -9,12 +10,21 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
     const [index, setIndex] = useState(0);
     const [limit, setLimit] = useState(() => Math.min(2, words.length - 1));
     const [round, setRound] = useState(1);
+    const [correct, setCorrect] = useState(0);
+    const [incorrect, setIncorrect] = useState(0);
 
     if (words.length === 0) {
         return <div>No Words Yet</div>
     }
 
-    function next() {
+    function next(wasCorrect: boolean) {
+
+        if(wasCorrect) {
+            setCorrect(correct => correct + 1)
+        } else {
+            setIncorrect(incorrect => incorrect + 1)
+        }
+
         setFlipped(false);
         
         if ( index === limit) {
@@ -36,6 +46,7 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
     return(
             <div className="w-96 h-128 flex flex-col">
                 <span>{`Round: ${round}`}</span>
+                <span>{`Correct: ${correct} Incorrect: ${incorrect}`}</span>
                 <div className="scene w-full h-full">
                     <div className={`${flipped? "flip":""} card-inner w-full h-full bg-slate-950 p-2 
                         border border-brand rounded-sm
@@ -68,13 +79,13 @@ export default function FlashCard({ words }: { words: Vocab[] }) {
                 <div
                     className="flex gap-2 items-center justify-center mt-2">
                     <button
-                        onClick={next}
+                        onClick={() => next(false)}
                         className="bg-red-500 px-4 py-2 rounded-xs w-[49%] border-b-4 border-red-700 h-15
                         hover:border-b-0 hover:cursor-pointer hover:translate-y-1">
                         Incorrect
                     </button>
                     <button
-                        onClick={next}
+                        onClick={() => next(true)}
                         className="bg-brand px-4 py-2 rounded-xs w-[49%] border-b-4 border-brand-dark h-15
                         hover:border-b-0 hover:cursor-pointer hover:translate-y-1">
                         Correct

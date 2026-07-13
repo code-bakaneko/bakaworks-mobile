@@ -22,7 +22,6 @@ export default async function Home() {
             <aside className="flex flex-col items-start justify-start">
               <p>Upcoming Updates:</p>
               <ol className="list-decimal">
-                <li>Add correct and incorrect flash card tracking</li>
                 <li>Expand Flash Card Vocabulary Listing</li>
                 <li>Multiple choice questions</li>
                 <li>Flash Card Sets</li>
@@ -40,7 +39,7 @@ export default async function Home() {
               <FlashCard
                 words={vocabWords? vocabWords : []}
               />
-            </div>
+            </div> 
           </section>
           <section>
             {/*Home Page Expandsion Goes here */}
