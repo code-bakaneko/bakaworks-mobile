@@ -1,21 +1,23 @@
 "use client"
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Tables } from "../lib/database.types";
 type Vocab = Tables<"language_vocabulary">;
 
 export default function MultipleChoice({ words }: { words:Vocab[] }) {
     const [index, setIndex] = useState(0);
     const [score, setScore] = useState(0);
+    const [choices, setChoices] = useState<Vocab[]>([]);
 
-    const choices = useMemo(() => {
+    useEffect(() => {
         const correct = words[index];
         const others = words
             .filter((word) => word.id !== correct.id)
             .sort(() => Math.random() - 0.5)
             .slice(0, 3);
-            return [correct, ...others].sort(() => Math.random() - 0.5);
+        setChoices([correct, ...others].sort(() => Math.random() - 0.5));
     }, [index, words]);
 
+   
     if (words.length === 0) return <div>No words to use multiple choice</div>;
 
     function answer (choice: Vocab) {
@@ -26,7 +28,7 @@ export default function MultipleChoice({ words }: { words:Vocab[] }) {
     }
     
     return (
-        <div className="bg-slate-950 p-10 border rounded-sm">
+        <div className="w-96 bg-slate-950 p-10 border border-slate-800 rounded-sm">
             <div className="flex flex-col gap-10">
                 <p>Score: {score}</p>
                 <div>
