@@ -18,6 +18,13 @@ export default async function Home() {
           </button>
         </header>
         <main className="flex-1 flex flex-col gap-10 px-20 w-full">
+          <section className="w-full flex flex-col items-center gap-6 py-24">
+            <h1 className="text-5xl font-extrabold">Japanese Without the Boring Parts</h1>
+            <p className="text-lg text-white/70 max-w-xl">
+              Flashcards, quizzes, and real vocabulary - built to make you actually stick with it.
+            </p>
+            <span className="text-white/50 text-sm animate-bounce mt-4">↓ Scroll down to try it ↓</span>
+          </section>
           <span>Scroll Down To Access Test Features</span>
           <section className="flex">
             <aside className="flex flex-col items-start justify-start">

@@ -8,26 +8,34 @@ export default function MultipleChoice({ words }: { words:Vocab[] }) {
     const [score, setScore] = useState(0);
     const [revealed, setRevealed] = useState(false);
     const [choices, setChoices] = useState<Vocab[]>([]);
+    const [deck, setDeck] = useState<Vocab[]>([]);
 
     useEffect(() => {
-        const correct = words[index];
-        const others = words
+        setDeck([...words].sort(() => Math.random() - 0.5));
+
+    }, [words]);
+
+    useEffect(() => {
+        if (deck.length === 0) return;
+
+        const correct = deck[index];
+        const others = deck
             .filter((word) => word.id !== correct.id)
             .sort(() => Math.random() - 0.5)
             .slice(0, 3);
         setChoices([correct, ...others].sort(() => Math.random() - 0.5));
-    }, [index, words]);
+    }, [index, deck]);
 
    
-    if (words.length === 0) return <div>No words to use multiple choice</div>;
+    if (deck.length === 0) return <div>No deck to use multiple choice</div>;
 
     function answer (choice: Vocab) {
         setRevealed(true);
-        if(choice.id === words[index].id) {
+        if(choice.id === deck[index].id) {
             setScore((score) => score + 1)
         }
         setTimeout(() => {
-            setIndex((index) => (index + 1) % words.length)
+            setIndex((index) => (index + 1) % deck.length)
             setRevealed(false);
         }, 1000);
     }
@@ -37,16 +45,17 @@ export default function MultipleChoice({ words }: { words:Vocab[] }) {
             <div className="flex flex-col gap-10">
                 <p className="text-muted">Score: {score}</p>
                 <div className="flex flex-col items-center gap-2">
-                    <p>{words[index].romanized}</p>
-                    <p>{words[index].reading}</p>
-                    <p className="text-2xl font-bold">{words[index].foreign_word}</p>
+                    <p>{deck[index].romanized}</p>
+                    <p>{deck[index].reading}</p>
+                    <p className="text-2xl font-bold">{deck[index].foreign_word}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     {choices.map((choice) => (
                         <button key={choice.id} onClick={() => answer(choice)}
                             className={`
-                                ${revealed && choice.id === words[index].id ? "bg-green-500 border-green-700": "bg-brand border-brand-dark"} px-4 py-2 min-h-10 rounded-sm border-b-4
-                                hover:cursor-pointer hover:translate-y-1 transition-all hover:border-0`}>
+                                ${revealed && choice.id === deck[index].id ? "bg-green-500 border-green-700": "bg-brand border-brand-dark"} px-4 py-2 min-h-10 rounded-sm border-b-4
+                                ${revealed? "": "hover:cursor-pointer hover:translate-y-1 transition-all hover:border-0"}`} 
+                                disabled={revealed}>
                             {choice.english_word}
                         </button>
                     ))}
