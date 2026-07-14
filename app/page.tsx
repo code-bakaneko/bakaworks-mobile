@@ -23,8 +23,8 @@ export default async function Home() {
             <aside className="flex flex-col items-start justify-start">
               <p>Upcoming Updates:</p>
               <ol className="list-decimal">
-                <li>Multiple choice questions</li>
                 <li>Flash Card Sets</li>
+                <li>Create Basic Home Page</li>
               </ol>
             </aside>
             <div className="flex-1 flex flex-col items-center">
