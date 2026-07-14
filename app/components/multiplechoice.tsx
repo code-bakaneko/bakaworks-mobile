@@ -16,6 +16,8 @@ export default function MultipleChoice({ words }: { words:Vocab[] }) {
             return [correct, ...others].sort(() => Math.random() - 0.5);
     }, [index, words]);
 
+    if (words.length === 0) return <div>No words to use multiple choice</div>;
+
     function answer (choice: Vocab) {
         if(choice.id === words[index].id) {
             setScore((score) => score + 1)
