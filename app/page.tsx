@@ -48,10 +48,24 @@ export default async function Home() {
               />
             </div> 
           </section>
-          <section>
+          <section className="flex flex-col items-center justify-center py-24">
             <MultipleChoice
               words={vocabWords? vocabWords : []}
             />
+          </section>
+          <section className="w-full flex flex-col items-center gap-6 py-24">
+            <h2 className="text-3xl font-extrabold">Create Your Account</h2>
+            <form className="flex flex-col gap-3 w-full max-w-sm">
+              <input name="email" type="email" placeholder="e-mail" required
+                className="bg-background border border-brand rounded-sm p-2"/>
+              <input name="password" type="password" placeholder="password" required
+                className="bg-background border border-brand rounded-sm p-2" />
+              <button type="submit"
+                className="bg-brand h-10 rounded-sm font-extrabold border-b-4 border-brand-dark
+                hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer">
+                Sign Up
+              </button>
+            </form>
           </section>
         </main>
         <footer className="h-20 flex gap-10 w-full items-center justify-center border-t-4 border-white/10">
