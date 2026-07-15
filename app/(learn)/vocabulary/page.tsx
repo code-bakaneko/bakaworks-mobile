@@ -24,6 +24,9 @@ export default async function VocabularyPage() {
                         <span className="text-center">{word.romanized}</span>
                         <span className="text-center text-brand">{word.foreign_word}</span>
                         <span className="text-center text-muted">{word.english_word}</span>
+                        <div className="w-full h-2 bg-slate-800 rounded-xs overflow-hidden">
+                            <div className="h-full bg-brand" style={{ width: `${50}%`}}></div>
+                        </div>
                     </div>
                 ))}
             </div>
