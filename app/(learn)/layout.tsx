@@ -6,9 +6,9 @@ export default function LearnLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div>
+        <div className="flex">
             <LearnSidebar />
-            <main>{children}</main>
+            <main className="flex-1">{children}</main>
         </div>
     )
 }
