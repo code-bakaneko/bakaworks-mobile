@@ -7,7 +7,8 @@ export default function LearnSidebar() {
 
     const links = [
         { name: "Learn", url: "/learn"},
-        { name: "Vocabulary", url: "/vocabulary"}
+        { name: "Vocabulary", url: "/vocabulary"},
+        { name: "Characters", url: "/characters"}
     ]
     return (
         <aside className="h-screen w-56 bg-slate-950 p-2 flex flex-col gap-2">
