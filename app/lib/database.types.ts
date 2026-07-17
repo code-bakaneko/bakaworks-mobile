@@ -39,6 +39,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          blurb: string | null
+          created_at: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name: string
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name?: string
+        }
+        Relationships: []
+      }
       language_vocabulary: {
         Row: {
           created_at: string | null
@@ -66,6 +87,27 @@ export type Database = {
           id?: never
           reading?: string | null
           romanized?: string | null
+        }
+        Relationships: []
+      }
+      schools: {
+        Row: {
+          blurb: string | null
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string
+          id?: never
+          name: string
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string
+          id?: never
+          name?: string
         }
         Relationships: []
       }
