@@ -39,27 +39,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      categories: {
-        Row: {
-          blurb: string | null
-          created_at: string | null
-          id: number
-          name: string
-        }
-        Insert: {
-          blurb?: string | null
-          created_at?: string | null
-          id?: never
-          name: string
-        }
-        Update: {
-          blurb?: string | null
-          created_at?: string | null
-          id?: never
-          name?: string
-        }
-        Relationships: []
-      }
       language_vocabulary: {
         Row: {
           created_at: string | null
@@ -110,6 +89,38 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      subjects: {
+        Row: {
+          blurb: string | null
+          created_at: string | null
+          id: number
+          name: string
+          school_id: number
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name: string
+          school_id: number
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name?: string
+          school_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
