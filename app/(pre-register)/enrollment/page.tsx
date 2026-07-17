@@ -11,7 +11,9 @@ export default async function PreRegisterCoursePage() {
             </section>
             {schools?.map((school) => (
                 <section key={school.id}
-                    className="flex flex-col text-center justify-center mt-20">
+                    className="
+                        flex flex-col text-center justify-center mt-20 max-w-4xl mx-auto
+                        border-b-2 border-white/10">
                     <h2>{school.name}</h2>
                     <p className="text-sm
                      text-muted">{school.blurb}</p>
