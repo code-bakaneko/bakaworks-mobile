@@ -39,6 +39,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      course: {
+        Row: {
+          blurb: string | null
+          created_at: string | null
+          id: number
+          name: string
+          subject_id: number
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name: string
+          subject_id: number
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name?: string
+          subject_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       language_vocabulary: {
         Row: {
           created_at: string | null
