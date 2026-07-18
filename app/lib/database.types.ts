@@ -101,6 +101,44 @@ export type Database = {
         }
         Relationships: []
       }
+      lessons: {
+        Row: {
+          blurb: string | null
+          created_at: string | null
+          id: number
+          name: string
+          unit_id: number
+          x: number
+          y: number
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name: string
+          unit_id: number
+          x?: number
+          y?: number
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string | null
+          id?: never
+          name?: string
+          unit_id?: number
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schools: {
         Row: {
           blurb: string | null
@@ -150,6 +188,38 @@ export type Database = {
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          blurb: string | null
+          course_id: number
+          created_at: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          blurb?: string | null
+          course_id: number
+          created_at?: string | null
+          id?: never
+          name: string
+        }
+        Update: {
+          blurb?: string | null
+          course_id?: number
+          created_at?: string | null
+          id?: never
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "units_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]

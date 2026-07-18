@@ -3,6 +3,7 @@ export default async function PreRegisterCoursePage() {
     const supabase = await createClient();
 
     const { data: schools, error} = await supabase.from("schools").select("*, subjects(*, courses(*))");
+    if(error) return <div>Failure to load Courses</div>;
 
     return (
         <div>
