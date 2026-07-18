@@ -24,14 +24,14 @@ export default async function PreRegisterCoursePage() {
                                 <p>{subject.blurb}</p>
                                 <div className="grid grid-cols-6">
                                     {subject.courses?.map((course) => (
-                                        <div key={course.id}
+                                        <button key={course.id}
                                             className="
                                             border border-white/30 border-b-4 border-b-brand rounded-sm
                                             flex flex-col items-center justify-center aspect-square
                                             hover:border-white hover:border-b-1 hover:translate-y-1 hover:cursor-pointer
                                             transition-all">
                                             {course.name}
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                         </section>
