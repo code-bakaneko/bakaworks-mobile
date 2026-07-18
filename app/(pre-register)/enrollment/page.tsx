@@ -2,7 +2,7 @@ import { createClient } from "@/app/lib/supabase/server"
 export default async function PreRegisterCoursePage() {
     const supabase = await createClient();
 
-    const { data: schools, error} = await supabase.from("schools").select("*, subjects(*)");
+    const { data: schools, error} = await supabase.from("schools").select("*, subjects(*, courses(*))");
 
     return (
         <div>
@@ -22,7 +22,18 @@ export default async function PreRegisterCoursePage() {
                         <section key={subject.id}>
                                 <h3>{subject.name}</h3>
                                 <p>{subject.blurb}</p>
-                                {}
+                                <div className="grid grid-cols-6">
+                                    {subject.courses?.map((course) => (
+                                        <div key={course.id}
+                                            className="
+                                            border border-white/30 border-b-4 border-b-brand rounded-sm
+                                            flex flex-col items-center justify-center aspect-square
+                                            hover:border-white hover:border-b-1 hover:translate-y-1 hover:cursor-pointer
+                                            transition-all">
+                                            {course.name}
+                                        </div>
+                                    ))}
+                                </div>
                         </section>
                     ))}
                 </section>

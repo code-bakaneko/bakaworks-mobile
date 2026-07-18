@@ -39,7 +39,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      course: {
+      courses: {
         Row: {
           blurb: string | null
           created_at: string | null
@@ -50,14 +50,14 @@ export type Database = {
         Insert: {
           blurb?: string | null
           created_at?: string | null
-          id?: never
+          id?: number
           name: string
           subject_id: number
         }
         Update: {
           blurb?: string | null
           created_at?: string | null
-          id?: never
+          id?: number
           name?: string
           subject_id?: number
         }
