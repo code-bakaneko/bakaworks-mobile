@@ -20,12 +20,21 @@ export default function LessonPlayer ({ steps }: { steps: Step[] }) {
 
     return (
         <div>
-            <p>{step.prompt}</p>
-            <div>
-                {step.choices?.map((choice) => (
-                    <button key={choice}>{choice}</button>
-                ))}
-            </div>
+            {step.type === "lecture" && (
+                <p>{step.content}</p>
+            )}
+
+            {step.type === "question" && (
+                <div>
+                    <p>{step.prompt}</p>
+                    <div>
+                        {step.choices?.map((choice) => (
+                            <button key={choice}>{choice}</button>
+                        ))}
+                    </div>
+                </div>
+            )}
+            <button>Continue</button>
         </div>
     )
 }

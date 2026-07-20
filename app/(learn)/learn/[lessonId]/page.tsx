@@ -1,3 +1,5 @@
+import LessonPlayer from "@/app/components/LessonPlayer";
+
 export default async function LessonPage({ params }: { params: Promise<{ lessonId: string }>}) {
     const { lessonId } = await params;
     const dummySteps = [
@@ -7,17 +9,7 @@ export default async function LessonPage({ params }: { params: Promise<{ lessonI
 
     return (
         <div>
-            {dummySteps.map((question) => (
-                <div key={question.id}>
-                    <p>{question.prompt}</p>
-                    <div className=" flex gap-2">
-                        {question.choices?.map((choice) => (
-                            <button key={choice} className="px-4 py-2 bg-brand">{choice}</button>
-                        ))}
-                    </div>
-                </div>
-            ))}
-            <button className="px-4 py-2 bg-green-600 rounded-sm">Check/Continue</button>
+            <LessonPlayer steps={dummySteps}/>
         </div>
     )
 }
