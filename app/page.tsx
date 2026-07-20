@@ -6,76 +6,116 @@ import MultipleChoice from "./components/MultipleChoice";
 export default async function Home() {
   const supabase = await createClient();
   const { data: vocabWords } = await supabase.from("language_vocabulary").select();
+  const words = vocabWords ?? [];
+
   return (
-    <div
-      className="flex flex-col gap-10 h-screen items-center">
-        <header className="w-full bg-slate-950 h-20 flex items-center justify-between px-10 py-5">
-          <span>BakaWorks BETA - Public Access</span>
-          <Link href={"/learn"} className="
-          bg-brand h-10 px-4 py-2 rounded-sm font-extrabold border-b-4 border-brand-dark
-          hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer">
-            Log In
-          </Link>
-        </header>
-        <main className="flex-1 flex flex-col gap-10 px-20 w-full">
-          <section className="w-full flex flex-col items-center gap-6 py-24">
-            <h1 className="text-5xl font-extrabold">Japanese Without the Boring Parts</h1>
-            <p className="text-lg text-white/70 max-w-xl">
-              Flashcards, quizzes, and real vocabulary - built to make you actually stick with it.
-            </p>
-            <span className="text-white/50 text-sm animate-bounce mt-4">↓ Scroll down to try it ↓</span>
-          </section>
-          <span>Scroll Down To Access Test Features</span>
-          <section className="flex">
-            <aside className="flex flex-col items-start justify-start">
-              <p>Upcoming Updates:</p>
-              <ol className="list-decimal">
-                <li>Flash Card Sets</li>
-                <li>Create Basic Home Page</li>
-              </ol>
-            </aside>
-            <div className="flex-1 flex flex-col items-center">
-              <div className="p-2">
-                <p>Instructions:</p>
-                <ol className="list-decimal">
-                  <li>Guess/remember the translation</li>
-                  <li>Click the card to flip</li>
-                  <li>Answer correct if you got the translation correct</li>
-                </ol>
-              </div>
-              <FlashCard
-                words={vocabWords? vocabWords : []}
-              />
-            </div> 
-          </section>
-          <section className="flex flex-col items-center justify-center py-24">
-            <MultipleChoice
-              words={vocabWords? vocabWords : []}
-            />
-          </section>
-          <section className="w-full flex flex-col items-center gap-6 py-24">
-            <h2 className="text-3xl font-extrabold">Create Your Account</h2>
-            <form className="flex flex-col gap-3 w-full max-w-sm">
+    <div className="flex flex-col min-h-screen">
+
+      <header className="sticky top-0 z-50 w-full h-20 flex items-center justify-between px-6 md:px-10
+        bg-slate-950/80 backdrop-blur border-b border-white/10">
+        <Link href="/" className="flex items-center gap-3">
+          <span className="text-xl font-extrabold tracking-tight">BakaWorks</span>
+          <span className="text-[10px] uppercase tracking-widest text-brand border border-brand/40
+            rounded-full px-2 py-0.5">
+            Beta
+          </span>
+        </Link>
+        <Link href="/learn" className="
+          bg-brand h-10 px-5 flex items-center rounded-sm font-extrabold border-b-4 border-brand-dark
+          hover:border-b-0 hover:translate-y-1 transition-all">
+          Log In
+        </Link>
+      </header>
+
+      <main className="flex-1 w-full">
+
+        <section className="flex flex-col items-center text-center gap-6 px-6 py-32 md:py-40">
+          <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
+            Learn Japanese
+          </span>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl leading-[1.05]">
+            Japanese Without<br />the Boring Parts
+          </h1>
+          <p className="text-lg md:text-xl text-muted max-w-xl leading-relaxed">
+            Flashcards, quizzes, and real vocabulary — built to make you actually stick with it.
+          </p>
+          <span className="text-white/40 text-sm animate-bounce mt-8">
+            ↓ Scroll down to try it ↓
+          </span>
+        </section>
+
+        <section className="border-t border-white/10 px-6 py-24">
+          <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
+            <div className="text-center flex flex-col gap-3">
+              <h2 className="text-3xl md:text-4xl font-extrabold">Flashcards</h2>
+              <p className="text-muted max-w-lg">
+                Guess the translation, flip the card, mark yourself honestly. The deck grows as you go.
+              </p>
+            </div>
+            <FlashCard words={words} />
+          </div>
+        </section>
+
+        <section className="border-t border-white/10 px-6 py-24">
+          <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
+            <div className="text-center flex flex-col gap-3">
+              <h2 className="text-3xl md:text-4xl font-extrabold">Multiple Choice</h2>
+              <p className="text-muted max-w-lg">
+                Four options, one right answer. Fast reps to lock the vocabulary in.
+              </p>
+            </div>
+            <MultipleChoice words={words} />
+          </div>
+        </section>
+
+        <section className="border-t border-white/10 px-6 py-28">
+          <div className="max-w-md mx-auto flex flex-col items-center gap-8">
+            <div className="text-center flex flex-col gap-3">
+              <h2 className="text-3xl md:text-4xl font-extrabold">Create Your Account</h2>
+              <p className="text-muted">
+                Free while we&apos;re in beta. Keep your progress across devices.
+              </p>
+            </div>
+            <form className="flex flex-col gap-3 w-full">
               <input name="email" type="email" placeholder="e-mail" required
-                className="bg-background border border-brand rounded-sm p-2"/>
+                className="bg-slate-950 border border-white/15 rounded-sm px-4 h-12
+                  placeholder:text-white/30
+                  focus:outline-none focus:border-brand transition-colors" />
               <input name="password" type="password" placeholder="password" required
-                className="bg-background border border-brand rounded-sm p-2" />
+                className="bg-slate-950 border border-white/15 rounded-sm px-4 h-12
+                  placeholder:text-white/30
+                  focus:outline-none focus:border-brand transition-colors" />
               <button type="submit"
-                className="bg-brand h-10 rounded-sm font-extrabold border-b-4 border-brand-dark
-                hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer">
+                className="bg-brand h-12 mt-2 rounded-sm font-extrabold border-b-4 border-brand-dark
+                  hover:border-b-0 hover:translate-y-1 transition-all">
                 Sign Up
               </button>
             </form>
-          </section>
-        </main>
-        <footer className="h-20 flex gap-10 w-full items-center justify-center border-t-4 border-white/10">
-            <a href="https://www.youtube.com/@BakaWorks">
-              <img src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/video.png" className="h-14"/>
+          </div>
+        </section>
+
+      </main>
+
+      <footer className="border-t border-white/10 px-6 py-10">
+        <div className="max-w-5xl mx-auto flex flex-col items-center gap-6">
+          <div className="flex gap-8">
+            <a href="https://www.youtube.com/@BakaWorks"
+              className="opacity-60 hover:opacity-100 transition-opacity">
+              <img
+                src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/video.png"
+                alt="YouTube" className="h-10" />
             </a>
-            <a href="https://x.com/bakaworkz" className="hover:bg-white">
-              <img src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/twitter.png" className="h-14"/>
+            <a href="https://x.com/bakaworkz"
+              className="opacity-60 hover:opacity-100 transition-opacity">
+              <img
+                src="https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/twitter.png"
+                alt="X" className="h-10" />
             </a>
-        </footer>
+          </div>
+          <p className="text-white/30 text-sm">BakaWorks — Beta</p>
+        </div>
+      </footer>
+
     </div>
   );
 }
