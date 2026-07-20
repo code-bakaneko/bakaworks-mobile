@@ -11,7 +11,9 @@ export default function LearnSidebar() {
         { name: "Characters", url: "/characters"}
     ]
     return (
-        <aside className="h-screen w-56 bg-slate-950 p-2 flex flex-col gap-2">
+        <aside className="sticky top-0 self-start shrink-0
+            h-screen w-56 overflow-y-auto
+            bg-slate-950 border-r border-white/10 p-2 flex flex-col gap-2">
             {links.map((link) => (
                 <Link key={link.name} href={link.url}
                     className={`px-3 py-2 rounded-sm transition-all
