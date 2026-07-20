@@ -14,13 +14,13 @@ export default async function LearnPage() {
                 <section key={unit.id}>
                     <h2>{unit.name}</h2>
                     <p>{unit.blurb}</p>
-                    <svg viewBox="0 0 250 500" className="min-w-500 w-full">
-                        <polyline points={unit.lessons.map((path) => `${path.x},${path.y}`).join(" ")} fill="none" strokeWidth=".3" className="stroke-white/20" />
+                    <svg viewBox="0 0 100 200" className="w-[700px] h-[500px] w-full">
+                        <polyline points={unit.lessons.map((path) => `${path.x},${path.y}`).join(" ")} fill="none" strokeWidth="1" className="stroke-white/20" />
                         {unit.lessons.map((lesson) => (
                             <Link key={lesson.id} href={`/learn/${lesson.id}`}>
                                 <g transform={`translate(${lesson.x}, ${lesson.y})`}>
                                     <path d={STAR_PATH}
-                                     transform="scale(0.25)" className="fill-brand" ></path>
+                                     transform="scale(.5)" className="fill-brand" ></path>
                                 </g>
                             </Link>
                         ))}

@@ -1,4 +1,4 @@
-import LearnSidebar from "../components/sidebar";
+import LearnSidebar from "../components/Sidebar";
 
 export default function LearnLayout({
     children,

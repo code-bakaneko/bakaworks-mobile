@@ -1,7 +1,7 @@
 import Link from "next/link";
-import FlashCard from "./components/flashcard";
+import FlashCard from "./components/Flashcard";
 import { createClient } from "./lib/supabase/server";
-import MultipleChoice from "./components/multiplechoice";
+import MultipleChoice from "./components/MultipleChoice";
 
 export default async function Home() {
   const supabase = await createClient();

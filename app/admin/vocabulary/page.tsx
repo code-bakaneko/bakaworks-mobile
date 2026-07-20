@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import FlashCard from "../../components/flashcard"
+import FlashCard from "../../components/Flashcard"
 import { supabaseAdmin } from "@/app/lib/supabase/admin"
 
 export default async function AdminFlashCardPage() {
