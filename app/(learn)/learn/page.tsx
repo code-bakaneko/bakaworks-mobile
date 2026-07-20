@@ -1,4 +1,5 @@
 import { createClient } from "@/app/lib/supabase/server"
+import Link from "next/link";
 
 export default async function LearnPage() {
     const supabase = await createClient();
@@ -13,12 +14,15 @@ export default async function LearnPage() {
                 <section key={unit.id}>
                     <h2>{unit.name}</h2>
                     <p>{unit.blurb}</p>
-                    <svg viewBox="0 0 250 500" className="w-full">
+                    <svg viewBox="0 0 250 500" className="min-w-500 w-full">
+                        <polyline points={unit.lessons.map((path) => `${path.x},${path.y}`).join(" ")} fill="none" strokeWidth=".3" className="stroke-white/20" />
                         {unit.lessons.map((lesson) => (
-                            <g key={lesson.id} transform={`translate(${lesson.x}, ${lesson.y})`}>
-                                <path d={STAR_PATH}
-                                 transform="scale(0.25)" className="fill-brand" ></path>
-                            </g>
+                            <Link key={lesson.id} href={`/learn/${lesson.id}`}>
+                                <g transform={`translate(${lesson.x}, ${lesson.y})`}>
+                                    <path d={STAR_PATH}
+                                     transform="scale(0.25)" className="fill-brand" ></path>
+                                </g>
+                            </Link>
                         ))}
                     </svg>
                 </section>
