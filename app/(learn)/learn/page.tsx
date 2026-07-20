@@ -41,7 +41,7 @@ export default async function LearnPage() {
                             className="stroke-white/25" />
 
                         {unit.lessons.map((lesson, lessonIndex) => (
-                            <Link key={lesson.id} href={`/learn/${lesson.id}`}>
+                            <Link key={lesson.id} href={`/lesson/${lesson.id}`}>
                                 <g
                                     transform={`translate(${lesson.x}, ${lesson.y}) scale(0.6)`}
                                     className="star-glow"
