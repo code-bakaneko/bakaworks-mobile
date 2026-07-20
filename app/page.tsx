@@ -2,11 +2,18 @@ import Link from "next/link";
 import FlashCard from "./components/Flashcard";
 import { createClient } from "./lib/supabase/server";
 import MultipleChoice from "./components/MultipleChoice";
+import { signUp } from "./lib/actions";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; message?: string }>;
+}) {
   const supabase = await createClient();
   const { data: vocabWords } = await supabase.from("language_vocabulary").select();
   const words = vocabWords ?? [];
+
+  const { error, message } = await searchParams;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -76,12 +83,25 @@ export default async function Home() {
                 Free while we&apos;re in beta. Keep your progress across devices.
               </p>
             </div>
-            <form className="flex flex-col gap-3 w-full">
+            <form id="signup" action={signUp} className="flex flex-col gap-3 w-full">
+              {error && (
+                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/30
+                  rounded-sm px-4 py-3">
+                  {error}
+                </p>
+              )}
+              {message && (
+                <p className="text-sm text-brand bg-brand/10 border border-brand/30
+                  rounded-sm px-4 py-3">
+                  {message}
+                </p>
+              )}
               <input name="email" type="email" placeholder="e-mail" required
                 className="bg-slate-950 border border-white/15 rounded-sm px-4 h-12
                   placeholder:text-white/30
                   focus:outline-none focus:border-brand transition-colors" />
               <input name="password" type="password" placeholder="password" required
+                minLength={6}
                 className="bg-slate-950 border border-white/15 rounded-sm px-4 h-12
                   placeholder:text-white/30
                   focus:outline-none focus:border-brand transition-colors" />
@@ -90,6 +110,10 @@ export default async function Home() {
                   hover:border-b-0 hover:translate-y-1 transition-all">
                 Sign Up
               </button>
+              <Link href="/learn" className="text-sm text-muted hover:text-white text-center mt-1
+                transition-colors">
+                Already have an account? Log in
+              </Link>
             </form>
           </div>
         </section>
