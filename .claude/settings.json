@@ -8,7 +8,10 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\)[0];const c=r.content;console.log\\('id',r.id,'| keys:',Object.keys\\(c\\).join\\(','\\)\\);console.log\\('strokes:',c.strokes?.length,'| viewBox:',c.viewBox,'| audio_url:',c.audio_url\\)}\\)\")",
       "PowerShell(node scripts/dump-content.js)",
       "PowerShell(node scripts/generate-audio.js --dry)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "PowerShell(node \"C:\\\\Users\\\\CODEBL~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Code-Black-Projects-bakaworks\\\\84c2394c-154d-4a19-b20f-6a1457dbf04e\\\\scratchpad\\\\second-voice-vowels.js\")",
+      "PowerShell(node \"C:\\\\Users\\\\CODEBL~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Code-Black-Projects-bakaworks\\\\84c2394c-154d-4a19-b20f-6a1457dbf04e\\\\scratchpad\\\\mixed-run.js\")",
+      "PowerShell(node \"C:\\\\Users\\\\CODEBL~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Code-Black-Projects-bakaworks\\\\84c2394c-154d-4a19-b20f-6a1457dbf04e\\\\scratchpad\\\\word-faceoff.js\")"
     ]
   }
 }

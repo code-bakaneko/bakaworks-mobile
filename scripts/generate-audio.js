@@ -38,6 +38,23 @@ const VOICEVOX = "http://127.0.0.1:50021";
  */
 const SPEAKER = Number(process.env.VOICEVOX_SPEAKER ?? 14);
 
+/**
+ * Characters a different voice says better, and only those.
+ *
+ * あ and う are pure vowels with no consonant to give them attack, and in
+ * ひまり's voice a solo one is gone before the ear settles on it. 九州そら
+ * (16) carries them. Everything else, including the words ああ / いい / あい,
+ * stays with ひまり — a word has to be spoken by one person, so the override
+ * is for single characters only.
+ *
+ * REQUIRES HER CREDIT. "VOICEVOX:九州そら" must stay visible on /credits:
+ * her terms allow free commercial use only while it is shown.
+ */
+const OVERRIDES = {
+    "あ": 16,
+    "う": 16,
+};
+
 /** Slower than conversation: these are single sounds being learned. */
 const SPEED = 0.9;
 
@@ -127,8 +144,10 @@ async function listVoices() {
  * what lets the speed be adjusted without re-analysing.
  */
 async function synthesize(text) {
+    const speaker = OVERRIDES[text] ?? SPEAKER;
+
     const query = await fetch(
-        `${VOICEVOX}/audio_query?speaker=${SPEAKER}&text=${encodeURIComponent(text)}`,
+        `${VOICEVOX}/audio_query?speaker=${speaker}&text=${encodeURIComponent(text)}`,
         { method: "POST" }
     );
     if (!query.ok) throw new Error(`audio_query ${query.status}: ${await query.text()}`);
@@ -136,7 +155,7 @@ async function synthesize(text) {
     const params = await query.json();
     params.speedScale = SPEED;
 
-    const audio = await fetch(`${VOICEVOX}/synthesis?speaker=${SPEAKER}`, {
+    const audio = await fetch(`${VOICEVOX}/synthesis?speaker=${speaker}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),
@@ -228,7 +247,8 @@ async function main() {
         const name = fileNameFor(text);
         const url = publicUrlFor(name);
 
-        process.stdout.write(`  ${text} -> ${name} ... `);
+        const voice = OVERRIDES[text] ? ` [voice ${OVERRIDES[text]}]` : "";
+        process.stdout.write(`  ${text} -> ${name}${voice} ... `);
         await upload(name, await synthesize(text));
         made++;
 

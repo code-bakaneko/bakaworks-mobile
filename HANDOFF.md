@@ -100,10 +100,13 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
 1. **Attribution is missing, and there are now two debts.** Neither is optional.
    - **KanjiVG** — all stroke data, Copyright (C) Ulrich Apel, **CC BY-SA 3.0**, which
      requires visible attribution and share-alike.
-   - **VOICEVOX:冥鳴ひまり** — every audio file. Commercial use is free *with* that credit
-     line displayed; her terms ask for nothing else, no application and no reporting.
-     Other characters are stricter, which is why she was chosen — 青山龍星 sounded better
-     but limits commercial use to registered businesses and needs prior permission.
+   - **VOICEVOX:冥鳴ひまり** — nearly every audio file. Commercial use is free *with* that
+     credit line displayed; her terms ask for nothing else, no application and no
+     reporting. Other characters are stricter, which is why she was chosen — 青山龍星
+     sounded better but limits commercial use to registered businesses and needs prior
+     permission.
+   - **VOICEVOX:九州そら** — あ and う only. Same deal, but her credit is *load-bearing*:
+     commercial use without it requires a paid licence.
 
    One credits page settles both. It does not exist yet.
 2. **Lecture audio still has no fallback.** Characters and words now play real files, but
@@ -138,6 +141,11 @@ uploads it to the `bakaworks` bucket and writes the URL into `content.audio_url`
   never runs on Vercel — the app just fetches a `.wav` like any other file.
 - One file per distinct sound, not per set: あ is spoken by eight sets and is one file,
   named by codepoint (`3042.wav`) so no Japanese ever reaches a filename or a URL.
+- **Two voices.** 冥鳴ひまり says everything except あ and う, which 九州そら says. Pure
+  vowels have no consonant to give them attack and ひまり's are gone before the ear
+  settles; そら's carry. The `OVERRIDES` table at the top of the script holds the
+  exceptions. It applies to single characters only — a WORD must be spoken by one voice,
+  so ああ and あい stay with ひまり even though they start with an overridden character.
 - Re-runnable and idempotent. Add characters, start VOICEVOX, run it again.
 - `--list` shows the voices, `--dry` shows what would be made without the engine running.
 

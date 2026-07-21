@@ -48,9 +48,20 @@ const CREDITS: Credit[] = [
         licence: "Free for commercial and non-commercial use, with credit",
         href: "https://voicevox.hiroshiba.jp/",
         obligation:
-            "Every sound in the app — each character, each word — is spoken by 冥鳴ひまり " +
-            "through VOICEVOX. Her terms permit commercial use freely, and ask in return " +
-            "only that this credit is shown.",
+            "Almost every sound in the app — the characters, the words, the lecture " +
+            "readings — is spoken by 冥鳴ひまり through VOICEVOX. Her terms permit " +
+            "commercial use freely, and ask in return only that this credit is shown.",
+    },
+    {
+        what: "Voice — あ and う",
+        title: "VOICEVOX:九州そら",
+        holder: "九州そら",
+        licence: "Free for commercial and non-commercial use, with credit",
+        href: "https://voicevox.hiroshiba.jp/",
+        obligation:
+            "あ and う are spoken by 九州そら. They are pure vowels with no consonant " +
+            "to carry them, and hers are the ones you can actually hear. Her credit is " +
+            "not optional: commercial use without it requires a paid licence.",
     },
 ];
 
@@ -107,13 +118,14 @@ export default function CreditsPage() {
 
                 <footer className="border-t border-white/10 pt-6 flex flex-col gap-2">
                     <p className="text-sm text-muted leading-relaxed">
-                        Japanese speech synthesis by{" "}
+                        Japanese speech by{" "}
                         <a href="https://voicevox.hiroshiba.jp/"
                             target="_blank" rel="noreferrer"
                             className="text-brand hover:underline underline-offset-4">
                             VOICEVOX
                         </a>
-                        . Stroke data from{" "}
+                        {" — VOICEVOX:冥鳴ひまり and VOICEVOX:九州そら. "}
+                        Stroke data from{" "}
                         <a href="http://kanjivg.tagaini.net"
                             target="_blank" rel="noreferrer"
                             className="text-brand hover:underline underline-offset-4">
