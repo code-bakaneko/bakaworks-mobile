@@ -8,7 +8,9 @@ export default async function LearnPage() {
 
     const { data: units, error } = await supabase
         .from("units")
-        .select("*, lessons(*)")
+        // Both joins are inner: a lesson with no sets is a dead link, and a
+        // unit with no playable lessons is an empty sky.
+        .select("*, lessons!inner(*, lesson_sets!inner(id))")
         .eq("course_id", 1)
         .order("id")
         .order("id", { referencedTable: "lessons" });

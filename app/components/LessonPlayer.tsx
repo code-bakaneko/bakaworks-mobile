@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
+import AudioButton from "./AudioButton";
 
 type LessonSet = Tables<"lesson_sets">;
 
@@ -13,6 +14,9 @@ type SetContent = {
     choices?: string[];
     answer?: string;
     url?: string;
+    // Audio is opt-in: the speaker button only renders when one of these is set.
+    audio?: string;      // text spoken with the browser's Japanese voice
+    audio_url?: string;  // a real audio file, takes priority when present
 };
 
 export default function LessonPlayer({
@@ -103,7 +107,10 @@ export default function LessonPlayer({
                             <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
                                 Question
                             </span>
-                            <p className="text-3xl md:text-4xl font-bold">{content.prompt}</p>
+                            <div className="flex items-center gap-4">
+                                <AudioButton text={content.audio} url={content.audio_url} />
+                                <p className="text-3xl md:text-4xl font-bold">{content.prompt}</p>
+                            </div>
                         </div>
 
                         <div className="grid gap-3">
