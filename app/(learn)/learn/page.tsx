@@ -76,7 +76,6 @@ export default async function LearnPage() {
                             const to = progress.get(lesson.id)!;
 
                             const fromDone = from.done >= from.total;
-                            const fraction = from.total > 0 ? from.done / from.total : 0;
 
                             // The far end tracks the NEXT lesson's progress, so the
                             // line keeps bluing as that star fills up rather than
@@ -84,15 +83,34 @@ export default async function LearnPage() {
                             const toFraction = to.total > 0 ? to.done / to.total : 0;
                             const toColor = `color-mix(in srgb, var(--brand) ${toFraction * 100}%, #ffffff)`;
 
-                            // Dash the lit portion to exactly `fraction` of the
-                            // segment: a lit run, then a gap longer than the line.
                             const length = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
                             const gradientId = `path-${prev.id}-${lesson.id}`;
 
+                            // One chunk per set, so the path itself shows how many
+                            // sets the lesson has and how many are done.
+                            const GAP = 2.5;
+                            const chunks = Math.max(from.total, 1);
+                            const chunkLength = (length - GAP * (chunks - 1)) / chunks;
+
+                            const segments = Array.from({ length: chunks }, (_, k) => {
+                                const startAt = k * (chunkLength + GAP);
+                                const t0 = startAt / length;
+                                const t1 = (startAt + chunkLength) / length;
+
+                                return {
+                                    lit: k < from.done,
+                                    x1: prev.x + (lesson.x - prev.x) * t0,
+                                    y1: prev.y + (lesson.y - prev.y) * t0,
+                                    x2: prev.x + (lesson.x - prev.x) * t1,
+                                    y2: prev.y + (lesson.y - prev.y) * t1,
+                                };
+                            });
+
                             return (
                                 <g key={lesson.id}>
-                                    {/* userSpaceOnUse so the gradient runs along the
-                                        segment rather than its bounding box. */}
+                                    {/* userSpaceOnUse spans the WHOLE line, so each
+                                        chunk picks up the colour at its own position
+                                        along it without any per-chunk maths. */}
                                     {fromDone && (
                                         <defs>
                                             <linearGradient id={gradientId} gradientUnits="userSpaceOnUse"
@@ -103,20 +121,27 @@ export default async function LearnPage() {
                                         </defs>
                                     )}
 
-                                    {/* Ground not yet walked stays dashed. */}
-                                    <line
-                                        x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
-                                        strokeWidth="0.8" strokeLinecap="round"
-                                        strokeDasharray={fromDone ? undefined : "2 3"}
-                                        className="stroke-white/15" />
-
-                                    {fraction > 0 && (
+                                    {/* A finished lesson leaves one unbroken line —
+                                        the chunks have served their purpose. Only the
+                                        path still being worked on is segmented. */}
+                                    {fromDone ? (
                                         <line
                                             x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
                                             strokeWidth="1.6" strokeLinecap="round"
-                                            strokeDasharray={`${length * fraction} ${length}`}
-                                            stroke={fromDone ? `url(#${gradientId})` : "#ffffff"}
-                                            strokeOpacity={fromDone ? 1 : 0.75} />
+                                            stroke={`url(#${gradientId})`} />
+                                    ) : (
+                                        /* Every chunk is solid. The gaps between them
+                                           do the segmenting — dashing the chunks too
+                                           produced a ragged pattern that did not line
+                                           up with the chunk boundaries. */
+                                        segments.map((seg, k) => (
+                                            <line key={k}
+                                                x1={seg.x1} y1={seg.y1} x2={seg.x2} y2={seg.y2}
+                                                strokeLinecap="round"
+                                                strokeWidth={seg.lit ? 1.6 : 1.2}
+                                                stroke="#ffffff"
+                                                strokeOpacity={seg.lit ? 0.85 : 0.2} />
+                                        ))
                                     )}
                                 </g>
                             );
