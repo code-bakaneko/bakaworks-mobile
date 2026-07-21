@@ -269,7 +269,13 @@ export default function LessonPlayer(props: {
                             </span>
                             <div className="flex items-center gap-4 justify-center">
                                 {(content.audio || content.audio_url) && (
-                                    <AudioButton text={content.audio} url={content.audio_url} />
+                                    // Keyed per item so it replays on each new
+                                    // question rather than only the first.
+                                    <AudioButton
+                                        key={set.id}
+                                        text={content.audio}
+                                        url={content.audio_url}
+                                        autoPlay />
                                 )}
                                 <p className="text-2xl md:text-3xl font-bold">{content.prompt}</p>
                             </div>
