@@ -28,5 +28,5 @@ export default async function LessonContent({ lessonId }: { lessonId: string }) 
         );
     }
 
-    return <LessonPlayer lessonName={lesson.name} sets={lesson.lesson_sets} />;
+    return <LessonPlayer lessonId={lesson.id} lessonName={lesson.name} sets={lesson.lesson_sets} />;
 }

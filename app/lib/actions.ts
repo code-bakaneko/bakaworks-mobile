@@ -42,3 +42,18 @@ export async function signOut() {
   await supabase.auth.signOut()
   redirect('/')
 }
+
+export async function completeLesson(lessonId: number) {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const userId = data?.claims.sub
+  if (!userId) return
+
+  // Idempotent: replaying the completion screen must not error on the PK.
+  await supabase
+    .from('lesson_completions')
+    .upsert(
+      { user_id: userId, lesson_id: lessonId },
+      { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
+    )
+}

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
+import { completeLesson } from "@/app/lib/actions";
 
 type LessonSet = Tables<"lesson_sets">;
 
@@ -20,9 +21,11 @@ type SetContent = {
 };
 
 export default function LessonPlayer({
+    lessonId,
     lessonName,
     sets,
 }: {
+    lessonId: number;
     lessonName: string;
     sets: LessonSet[];
 }) {
@@ -36,6 +39,13 @@ export default function LessonPlayer({
     const progress = (index / sets.length) * 100;
     const isQuestion = set?.type === "multiple_choice";
     const isCorrect = checked && selected === content.answer;
+    const finished = index >= sets.length;
+
+    // Record completion once the player reaches the end. This is what unlocks
+    // the next lesson on the star map.
+    useEffect(() => {
+        if (finished) completeLesson(lessonId);
+    }, [finished, lessonId]);
 
     function advance() {
         if (isQuestion && !checked) {
