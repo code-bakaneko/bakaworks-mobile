@@ -1,12 +1,21 @@
 'use client'
 
 import { useCallback, useEffect, useState } from "react";
-import { speakJapanese } from "@/app/lib/speak";
+import { playJapanese } from "@/app/lib/speak";
 
 /**
- * Plays a set's audio. Prefers a real file when `url` is given, otherwise
- * falls back to the browser's Japanese speech synthesis voice so lessons
- * have sound before any audio files exist.
+ * Plays a set's audio, in order of preference:
+ *
+ *   1. `url`, when the set stores one explicitly
+ *   2. the recording of `text`, found by deriving its filename
+ *   3. the browser's Japanese voice
+ *
+ * Step 2 is what makes this work everywhere without plumbing. A trace set
+ * carries `character` and `audio_url` but no `audio`, so passing only the
+ * character used to mean the browser voice spoke it — silently, on any
+ * machine without a Japanese voice installed. Deriving the URL from the text
+ * means anything that knows WHAT is being said gets the recording, whether
+ * or not whoever wired it up remembered to pass a URL.
  */
 export default function AudioButton({
     text,
@@ -32,8 +41,9 @@ export default function AudioButton({
         }
 
         if (!text) return;
-        if (!speakJapanese(text)) return;
+        playJapanese(text);
 
+        // The recording and the synth report progress differently, and
         // speechSynthesis fires onstart/onend inconsistently across browsers,
         // so the pressed state is timed rather than event-driven.
         setPlaying(true);
