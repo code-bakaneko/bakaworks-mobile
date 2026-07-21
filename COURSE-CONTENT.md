@@ -35,7 +35,7 @@ _Your first ten characters — the vowels and the K row._
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
 | 1 | あ | 3 | 12 | 84,168 |
-| 2 | い | 2 | 8 | 74,140 |
+| 2 | い | 3 | 11 | 74,140 |
 | 3 | う | 2 | 8 | 50,150 |
 | 4 | え | 2 | 8 | 38,120 |
 | 5 | お | 2 | 8 | 34,92 |
@@ -85,6 +85,12 @@ _i_
 - `[item:222]` **trace** — い (i), 2 strokes
 - `[item:223]` **trace** — い (i), 2 strokes
 - `[item:224]` **trace** — い (i), 2 strokes
+
+**Set 3** &nbsp; `[set:2.3]`
+
+- `[item:372]` **lecture** — い is "ee". On its own it spells a few uncommon nouns, but you will meet those written in kanji rather than kana — leave them for later. Written twice, though, you get いい: "good", "fine", one of the most common words in the language. Say both characters fully — i-i, two beats — not one long "ee". And now that you have あ and い, you can write あい: love. This is how the rest of the course works — every new character opens up the words it can spell with the ones you already have.
+- `[item:373]` **typing** — {"audio":"いい","answer":"いい","prompt":"Good, fine — two beats, not one long sound"}
+- `[item:374]` **typing** — {"audio":"あい","answer":"あい","prompt":"Love — your first two characters together"}
 
 ##### う &nbsp; `[lesson:3]`
 _u_
@@ -487,8 +493,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **41**
-- Items: **164**
+- Sets: **42**
+- Items: **167**
 
 ## Set types
 
