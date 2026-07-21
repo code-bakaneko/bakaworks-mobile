@@ -101,6 +101,41 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_sets: {
+        Row: {
+          content: Json
+          created_at: string
+          id: number
+          lesson_id: number
+          sort: number
+          type: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: number
+          lesson_id: number
+          sort: number
+          type: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: number
+          lesson_id?: number
+          sort?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_sets_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           blurb: string | null
