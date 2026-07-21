@@ -177,16 +177,19 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          gold: number
           id: string
           role: string
         }
         Insert: {
           created_at?: string
+          gold?: number
           id: string
           role?: string
         }
         Update: {
           created_at?: string
+          gold?: number
           id?: string
           role?: string
         }
