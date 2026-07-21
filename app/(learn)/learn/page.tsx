@@ -64,25 +64,40 @@ export default async function LearnPage() {
 
                     <svg viewBox="0 0 100 200" className="w-[320px] h-[640px] overflow-visible">
 
-                        {/* One line per gap. A segment leading into a locked
-                            lesson is dashed and dimmer. */}
+                        {/* One segment per gap, and it doubles as the progress
+                            bar for the lesson it leaves. Fully lit means that
+                            lesson is done and the next star is unlocked. */}
                         {unit.lessons.slice(1).map((lesson, i) => {
                             const prev = unit.lessons[i];
-                            const locked = !unlocked.get(lesson.id);
+                            const { done, total } = progress.get(prev.id)!;
+                            const fraction = total > 0 ? done / total : 0;
+
+                            // Dash the lit portion to exactly `fraction` of the
+                            // segment: a lit run, then a gap longer than the line.
+                            const length = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
+
                             return (
-                                <line key={lesson.id}
-                                    x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
-                                    strokeWidth="0.8"
-                                    strokeLinecap="round"
-                                    strokeDasharray={locked ? "2 3" : undefined}
-                                    className={locked ? "stroke-white/15" : "stroke-white/25"} />
+                                <g key={lesson.id}>
+                                    <line
+                                        x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
+                                        strokeWidth="0.8" strokeLinecap="round"
+                                        className="stroke-white/12" />
+                                    {fraction > 0 && (
+                                        <line
+                                            x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
+                                            strokeWidth="1.6" strokeLinecap="round"
+                                            strokeDasharray={`${length * fraction} ${length}`}
+                                            className={fraction >= 1
+                                                ? "stroke-brand"
+                                                : "stroke-brand/60"} />
+                                    )}
+                                </g>
                             );
                         })}
 
                         {unit.lessons.map((lesson, lessonIndex) => {
                             const locked = !unlocked.get(lesson.id);
                             const { done, total } = progress.get(lesson.id)!;
-                            const finished = done >= total;
 
                             const label = locked
                                 ? `${lesson.name} (locked)`
@@ -97,15 +112,6 @@ export default async function LearnPage() {
                                         React's text separator comment would be parsed as
                                         literal text and break hydration. */}
                                     <title>{label}</title>
-
-                                    {/* Progress ring: how many sets of this lesson are done. */}
-                                    {!locked && total > 1 && (
-                                        <circle
-                                            r="14" fill="none" strokeWidth="2.5"
-                                            strokeDasharray={`${(done / total) * 88} 88`}
-                                            transform="rotate(-90)"
-                                            className={finished ? "stroke-green-400" : "stroke-brand/70"} />
-                                    )}
                                     <path d={STAR_PATH}
                                         className={locked ? "fill-slate-600" : "fill-brand"} />
                                 </g>

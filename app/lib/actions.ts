@@ -39,6 +39,35 @@ export async function signIn(formData: FormData) {
   redirect('/learn')
 }
 
+/**
+ * Wipes the calling user's own progress. Admin only, for testing.
+ *
+ * The role is re-checked here rather than trusted from the caller: the
+ * sidebar hides the button for non-admins, but a hidden button is not
+ * access control — a server action is a public endpoint.
+ */
+export async function resetProgress() {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const userId = data?.claims.sub
+  if (!userId) return
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single()
+
+  if (profile?.role !== 'admin') return
+
+  // set_completions has no delete policy, and profiles has no update policy,
+  // so both run through the secret key. Scoped to this user only.
+  await supabaseAdmin.from('set_completions').delete().eq('user_id', userId)
+  await supabaseAdmin.from('profiles').update({ gold: 0 }).eq('id', userId)
+
+  revalidatePath('/learn', 'layout')
+}
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

@@ -26,15 +26,7 @@ type SetContent = {
     viewBox?: string;
 };
 
-export default function LessonPlayer({
-    lessonId,
-    lessonName,
-    setNumber,
-    setPosition,
-    setTotal,
-    isReplay,
-    sets,
-}: {
+export default function LessonPlayer(props: {
     lessonId: number;
     lessonName: string;
     setNumber: number;
@@ -43,6 +35,14 @@ export default function LessonPlayer({
     isReplay: boolean;
     sets: LessonSet[];
 }) {
+    // Freeze what this session is playing. Completing a set fires a server
+    // action, and a server action refreshes the current route — which hands
+    // this component the NEXT set's props while `index` is still at the end
+    // of the old one. That instantly looked "finished" and auto-completed
+    // every remaining set. Capturing on mount makes later props inert.
+    const [session] = useState(() => props);
+    const { lessonId, lessonName, setNumber, setPosition, setTotal, isReplay, sets } = session;
+
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
     const [checked, setChecked] = useState(false);
@@ -151,9 +151,6 @@ export default function LessonPlayer({
                         className="h-full bg-brand rounded-full transition-all duration-300"
                         style={{ width: `${progress}%` }} />
                 </div>
-                <span className="text-sm text-muted tabular-nums whitespace-nowrap">
-                    Set {setPosition}/{setTotal} · {index + 1}/{sets.length}
-                </span>
             </header>
 
             <main className="flex-1 flex flex-col justify-center max-w-2xl w-full mx-auto px-6 py-10">

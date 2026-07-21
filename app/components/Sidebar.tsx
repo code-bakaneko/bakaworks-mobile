@@ -1,9 +1,9 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut } from "../lib/actions"
+import { signOut, resetProgress } from "../lib/actions"
 
-export default function LearnSidebar() {
+export default function LearnSidebar({ isAdmin = false }: { isAdmin?: boolean }) {
     const pathname = usePathname();
 
     const links = [
@@ -22,7 +22,28 @@ export default function LearnSidebar() {
                     {link.name}
                 </Link>
             ))}
-            <form action={signOut} className="mt-auto">
+
+            {isAdmin && (
+                <div className="mt-auto flex flex-col gap-2 pt-2 border-t border-white/10">
+                    <span className="px-3 text-[10px] uppercase tracking-[0.2em] text-muted font-bold">
+                        Admin
+                    </span>
+                    <Link href="/admin/vocabulary"
+                        className="px-3 py-2 rounded-sm transition-all text-muted
+                            hover:text-white hover:bg-brand/30">
+                        Admin Panel
+                    </Link>
+                    <form action={resetProgress}>
+                        <button type="submit"
+                            className="w-full text-left px-3 py-2 rounded-sm transition-all
+                                text-muted hover:text-white hover:bg-amber-500/20 hover:cursor-pointer">
+                            Reset Progress
+                        </button>
+                    </form>
+                </div>
+            )}
+
+            <form action={signOut} className={isAdmin ? "" : "mt-auto"}>
                 <button type="submit"
                     className="w-full text-left px-3 py-2 rounded-sm transition-all
                         text-muted hover:text-white hover:bg-red-500/20 hover:cursor-pointer">
