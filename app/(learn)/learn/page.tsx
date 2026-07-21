@@ -64,32 +64,59 @@ export default async function LearnPage() {
 
                     <svg viewBox="0 0 100 200" className="w-[320px] h-[640px] overflow-visible">
 
-                        {/* One segment per gap, and it doubles as the progress
-                            bar for the lesson it leaves. Fully lit means that
-                            lesson is done and the next star is unlocked. */}
+                        {/* Each segment doubles as the progress bar for the lesson
+                            it leaves, and takes its colour from the two stars it
+                            joins: white for an unfinished lesson, blue for a
+                            finished one. So a half-walked path is white, a path
+                            out of a finished lesson fades blue-to-white, and a
+                            path between two finished lessons is solid blue. */}
                         {unit.lessons.slice(1).map((lesson, i) => {
                             const prev = unit.lessons[i];
-                            const { done, total } = progress.get(prev.id)!;
-                            const fraction = total > 0 ? done / total : 0;
+                            const from = progress.get(prev.id)!;
+                            const to = progress.get(lesson.id)!;
+
+                            const fromDone = from.done >= from.total;
+                            const fraction = from.total > 0 ? from.done / from.total : 0;
+
+                            // The far end tracks the NEXT lesson's progress, so the
+                            // line keeps bluing as that star fills up rather than
+                            // flipping colour only when it completes.
+                            const toFraction = to.total > 0 ? to.done / to.total : 0;
+                            const toColor = `color-mix(in srgb, var(--brand) ${toFraction * 100}%, #ffffff)`;
 
                             // Dash the lit portion to exactly `fraction` of the
                             // segment: a lit run, then a gap longer than the line.
                             const length = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
+                            const gradientId = `path-${prev.id}-${lesson.id}`;
 
                             return (
                                 <g key={lesson.id}>
+                                    {/* userSpaceOnUse so the gradient runs along the
+                                        segment rather than its bounding box. */}
+                                    {fromDone && (
+                                        <defs>
+                                            <linearGradient id={gradientId} gradientUnits="userSpaceOnUse"
+                                                x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}>
+                                                <stop offset="0%" stopColor="var(--brand)" />
+                                                <stop offset="100%" stopColor={toColor} />
+                                            </linearGradient>
+                                        </defs>
+                                    )}
+
+                                    {/* Ground not yet walked stays dashed. */}
                                     <line
                                         x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
                                         strokeWidth="0.8" strokeLinecap="round"
-                                        className="stroke-white/12" />
+                                        strokeDasharray={fromDone ? undefined : "2 3"}
+                                        className="stroke-white/15" />
+
                                     {fraction > 0 && (
                                         <line
                                             x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
                                             strokeWidth="1.6" strokeLinecap="round"
                                             strokeDasharray={`${length * fraction} ${length}`}
-                                            className={fraction >= 1
-                                                ? "stroke-brand"
-                                                : "stroke-brand/60"} />
+                                            stroke={fromDone ? `url(#${gradientId})` : "#ffffff"}
+                                            strokeOpacity={fromDone ? 1 : 0.75} />
                                     )}
                                 </g>
                             );
@@ -99,21 +126,31 @@ export default async function LearnPage() {
                             const locked = !unlocked.get(lesson.id);
                             const { done, total } = progress.get(lesson.id)!;
 
+                            const finished = done >= total;
+
                             const label = locked
                                 ? `${lesson.name} (locked)`
                                 : `${lesson.name} — ${done}/${total} sets`;
 
+                            // White until every set is done, then blue. Locked
+                            // stars stay dim and unlit.
+                            const glow = locked
+                                ? ""
+                                : finished ? "star-glow" : "star-glow is-white";
+                            const fill = locked
+                                ? "fill-slate-600"
+                                : finished ? "fill-brand" : "fill-white";
+
                             const star = (
                                 <g
                                     transform={`translate(${lesson.x}, ${lesson.y}) scale(0.6)`}
-                                    className={locked ? "" : "star-glow"}
+                                    className={glow}
                                     style={locked ? undefined : { animationDelay: `${(lessonIndex % 5) * 0.8}s` }}>
                                     {/* One child only. <title> is a raw text element, so
                                         React's text separator comment would be parsed as
                                         literal text and break hydration. */}
                                     <title>{label}</title>
-                                    <path d={STAR_PATH}
-                                        className={locked ? "fill-slate-600" : "fill-brand"} />
+                                    <path d={STAR_PATH} className={fill} />
                                 </g>
                             );
 

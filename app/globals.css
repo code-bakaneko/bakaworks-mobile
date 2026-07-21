@@ -71,23 +71,38 @@
 }
 
 .star-glow {
+  --glow: var(--brand);
   filter:
-    drop-shadow(0 0 1.5px var(--brand))
-    drop-shadow(0 0 4px var(--brand));
+    drop-shadow(0 0 1.5px var(--glow))
+    drop-shadow(0 0 4px var(--glow));
   animation: twinkle 4s ease-in-out infinite;
 }
 
+/* Unfinished lessons glow white; finished ones glow brand blue. */
+.star-glow.is-white {
+  --glow: #ffffff;
+}
+
+/* Pulse the halo, never the star. Animating opacity made the star itself
+   go translucent and let the background show through it. */
 @keyframes twinkle {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.65; }
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 1.5px var(--glow))
+      drop-shadow(0 0 5px var(--glow));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 1px var(--glow))
+      drop-shadow(0 0 2px var(--glow));
+  }
 }
 
 .star-glow:hover {
   filter:
     drop-shadow(0 0 3px #fff)
-    drop-shadow(0 0 10px var(--brand));
+    drop-shadow(0 0 10px var(--glow));
   animation: none;
-  opacity: 1;
 }
 
 .lesson-enter {

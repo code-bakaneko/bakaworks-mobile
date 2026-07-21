@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
 import KanaTracer from "./KanaTracer";
+import SpeakableText from "./SpeakableText";
 import { completeSet } from "@/app/lib/actions";
 
 type LessonSet = Tables<"lesson_sets">;
@@ -52,7 +53,10 @@ export default function LessonPlayer(props: {
     const set = sets[index];
     const content = (set?.content ?? {}) as SetContent;
     const progress = (index / sets.length) * 100;
-    const isQuestion = set?.type === "multiple_choice";
+    // Both are graded the same way; only the prompt differs — text for one,
+    // a played sound for the other.
+    const isQuestion = set?.type === "multiple_choice" || set?.type === "listen";
+    const isListen = set?.type === "listen";
     const isTrace = set?.type === "trace";
     const isCorrect = checked && selected === content.answer;
     const finished = index >= sets.length;
@@ -160,23 +164,44 @@ export default function LessonPlayer(props: {
                         <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
                             {lessonName}
                         </span>
-                        <p className="text-xl md:text-2xl leading-relaxed">{content.text}</p>
+                        <p className="text-xl md:text-2xl leading-relaxed">
+                            <SpeakableText text={content.text ?? ""} />
+                        </p>
+                        <span className="text-sm text-muted">
+                            Tap any Japanese to hear it.
+                        </span>
                     </div>
                 )}
 
                 {isQuestion && (
                     <div className="flex flex-col gap-8">
-                        <div className="flex flex-col gap-3">
-                            <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
-                                Question
-                            </span>
-                            <div className="flex items-center gap-4">
-                                <AudioButton text={content.audio} url={content.audio_url} />
-                                <p className="text-3xl md:text-4xl font-bold">{content.prompt}</p>
-                            </div>
-                        </div>
 
-                        <div className="grid gap-3">
+                        {isListen ? (
+                            /* The sound IS the question. No text prompt, so the
+                               character binds to the sound rather than to an
+                               English spelling of it. */
+                            <div className="flex flex-col items-center gap-4">
+                                <AudioButton
+                                    key={set.id}
+                                    text={content.audio}
+                                    url={content.audio_url}
+                                    size="lg"
+                                    autoPlay />
+                                <span className="text-sm text-muted">Tap to hear it again</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-3">
+                                <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
+                                    Question
+                                </span>
+                                <div className="flex items-center gap-4">
+                                    <AudioButton text={content.audio} url={content.audio_url} />
+                                    <p className="text-3xl md:text-4xl font-bold">{content.prompt}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className={isListen ? "grid grid-cols-2 gap-3" : "grid gap-3"}>
                             {content.choices?.map((choice) => {
                                 const isAnswer = choice === content.answer;
                                 const isPicked = choice === selected;
@@ -195,9 +220,12 @@ export default function LessonPlayer(props: {
                                         key={choice}
                                         onClick={() => !checked && setSelected(choice)}
                                         disabled={checked}
-                                        className={`px-5 h-14 rounded-sm text-left font-bold border-2
+                                        className={`rounded-sm font-bold border-2
                                             transition-all hover:cursor-pointer
-                                            disabled:cursor-default ${style}`}>
+                                            disabled:cursor-default ${style}
+                                            ${isListen
+                                                ? "h-28 text-5xl flex items-center justify-center"
+                                                : "px-5 h-14 text-left"}`}>
                                         {choice}
                                     </button>
                                 );
