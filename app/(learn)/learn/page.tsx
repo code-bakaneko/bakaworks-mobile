@@ -5,15 +5,49 @@ import { createClient } from "@/app/lib/supabase/server"
  * distances and staggered delays so it reads as a firework rather than a
  * pulsing ring.
  */
-const SPARKS = Array.from({ length: 14 }, (_, i) => {
-    const angle = (i / 14) * Math.PI * 2;
-    const distance = 3.5 + (i % 4) * 1.3;
+/** Seeded pseudo-random in [0,1). Deterministic on purpose — Math.random()
+ *  here would differ between server render and any re-render. */
+function noise(seed: number): number {
+    const x = Math.sin(seed * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+}
+
+const SPARKS = Array.from({ length: 16 }, (_, i) => {
+    // Fan across the upper half only. In SVG y grows downward, so angles from
+    // PI to 2PI point up. Jitter every value so no two particles march in step.
+    const angle = Math.PI + ((i + noise(i) * 0.9) / 15) * Math.PI;
+    const distance = 1.6 + noise(i + 40) * 1.6;
 
     return {
         dx: +(Math.cos(angle) * distance).toFixed(2),
         dy: +(Math.sin(angle) * distance).toFixed(2),
-        r: i % 3 === 0 ? 0.26 : 0.17,
-        delay: +((i % 5) * 0.05).toFixed(2),
+        r: +(0.13 + noise(i + 80) * 0.16).toFixed(3),
+        delay: +(noise(i + 120) * 0.42).toFixed(2),
+        duration: +(0.42 + noise(i + 160) * 0.3).toFixed(2),
+    };
+});
+
+/** Streaks layered over the dots — short rays that shoot outward, giving the
+ *  burst direction rather than just presence. Fewer and longer than the dots. */
+const STREAKS = Array.from({ length: 7 }, (_, i) => {
+    const angle = Math.PI + ((i + noise(i + 200) * 0.9) / 6) * Math.PI;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    const inner = 0.5 + noise(i + 240) * 0.5;   // gap before the streak starts
+    const length = 0.8 + noise(i + 280) * 1.0;  // how long the ray is
+    const travel = 1.7 + noise(i + 320) * 1.5;  // how far it flies
+
+    return {
+        x1: +(cos * inner).toFixed(2),
+        y1: +(sin * inner).toFixed(2),
+        x2: +(cos * (inner + length)).toFixed(2),
+        y2: +(sin * (inner + length)).toFixed(2),
+        dx: +(cos * travel).toFixed(2),
+        dy: +(sin * travel).toFixed(2),
+        width: +(0.09 + noise(i + 360) * 0.07).toFixed(3),
+        delay: +(noise(i + 400) * 0.4).toFixed(2),
+        duration: +(0.45 + noise(i + 440) * 0.28).toFixed(2),
     };
 });
 
@@ -94,10 +128,13 @@ export default async function LearnPage() {
 
                             const fromDone = from.done >= from.total;
 
-                            // The far end tracks the NEXT lesson's progress, so the
-                            // line keeps bluing as that star fills up rather than
-                            // flipping colour only when it completes.
+            // Each end of the line takes the colour of the star it touches, and a
+                            // star blues in step with its own progress. So the line is
+                            // white between two untouched lessons, blue between two
+                            // finished ones, and a gradient at every stage between.
+                            const fromFraction = from.total > 0 ? from.done / from.total : 0;
                             const toFraction = to.total > 0 ? to.done / to.total : 0;
+                            const fromColor = `color-mix(in srgb, var(--brand) ${fromFraction * 100}%, #ffffff)`;
                             const toColor = `color-mix(in srgb, var(--brand) ${toFraction * 100}%, #ffffff)`;
 
                             const length = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
@@ -128,15 +165,13 @@ export default async function LearnPage() {
                                     {/* userSpaceOnUse spans the WHOLE line, so each
                                         chunk picks up the colour at its own position
                                         along it without any per-chunk maths. */}
-                                    {fromDone && (
-                                        <defs>
-                                            <linearGradient id={gradientId} gradientUnits="userSpaceOnUse"
-                                                x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}>
-                                                <stop offset="0%" stopColor="var(--brand)" />
-                                                <stop offset="100%" stopColor={toColor} />
-                                            </linearGradient>
-                                        </defs>
-                                    )}
+                                    <defs>
+                                        <linearGradient id={gradientId} gradientUnits="userSpaceOnUse"
+                                            x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}>
+                                            <stop offset="0%" stopColor={fromColor} />
+                                            <stop offset="100%" stopColor={toColor} />
+                                        </linearGradient>
+                                    </defs>
 
                                     {/* A finished lesson leaves one unbroken line —
                                         the chunks have served their purpose. Only the
@@ -156,8 +191,8 @@ export default async function LearnPage() {
                                                 x1={seg.x1} y1={seg.y1} x2={seg.x2} y2={seg.y2}
                                                 strokeLinecap="round"
                                                 strokeWidth={seg.lit ? 1.6 : 1.2}
-                                                stroke="#ffffff"
-                                                strokeOpacity={seg.lit ? 0.85 : 0.2} />
+                                                stroke={seg.lit ? `url(#${gradientId})` : "#ffffff"}
+                                                strokeOpacity={seg.lit ? 1 : 0.2} />
                                         ))
                                     )}
 
@@ -174,6 +209,22 @@ export default async function LearnPage() {
                                                         "--dx": `${spark.dx}px`,
                                                         "--dy": `${spark.dy}px`,
                                                         animationDelay: `${spark.delay}s`,
+                                                        animationDuration: `${spark.duration}s`,
+                                                    } as React.CSSProperties} />
+                                            ))}
+                                            {STREAKS.map((streak, k) => (
+                                                <line key={`s${k}`}
+                                                    x1={streak.x1} y1={streak.y1}
+                                                    x2={streak.x2} y2={streak.y2}
+                                                    strokeWidth={streak.width}
+                                                    strokeLinecap="round"
+                                                    stroke={k % 3 === 0 ? "var(--brand)" : "#ffffff"}
+                                                    className="spark-particle"
+                                                    style={{
+                                                        "--dx": `${streak.dx}px`,
+                                                        "--dy": `${streak.dy}px`,
+                                                        animationDelay: `${streak.delay}s`,
+                                                        animationDuration: `${streak.duration}s`,
                                                     } as React.CSSProperties} />
                                             ))}
                                             <circle r="0.7" className="spark-core fill-white" />
