@@ -97,6 +97,20 @@ export async function completeSet(lessonId: number, setNumber: number) {
       { onConflict: 'user_id,lesson_id,set_number', ignoreDuplicates: true }
     )
 
+  // Stamp it as the most recently played. Once every set of a lesson is
+  // done, re-entering plays whichever was played longest ago, so the sets
+  // cycle instead of the first one repeating forever. The upsert above
+  // deliberately ignores duplicates, so on a replay it wrote nothing and
+  // this is what moves the row.
+  //
+  // Through the secret key on purpose: set_completions has no update policy,
+  // and an update policy scoped only by user_id would let a user rewrite the
+  // lesson_id on a row and unlock a lesson they never played.
+  await supabaseAdmin
+    .from('set_completions')
+    .update({ completed_at: new Date().toISOString() })
+    .match({ user_id: userId, lesson_id: lessonId, set_number: setNumber })
+
   // Gold is paid on EVERY finished set, including replays.
   // profiles has no update policy on purpose, so the award runs through the
   // secret key. award_gold increments atomically inside Postgres and returns

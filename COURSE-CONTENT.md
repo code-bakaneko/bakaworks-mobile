@@ -66,8 +66,8 @@ _a_
 **Set 3** &nbsp; `[set:1.3]`
 
 - `[item:369]` **lecture** — あ is one of the very few characters that is a whole word on its own. あ is the sound of noticing something — "ah", "oh". Say it twice and you get ああ, which is the same reaction drawn out, and also means "like that". Almost every other Japanese word needs a consonant, so these two are rare: nothing else is written with あ alone.
-- `[item:370]` **typing** — {"audio":"あ","answer":"あ","prompt":"The sound of noticing something — \"ah\""}
-- `[item:371]` **typing** — {"audio":"ああ","answer":"ああ","prompt":"The same, drawn out — also \"like that\""}
+- `[item:370]` **typing** — {"audio":"あ","answer":"あ","prompt":"The sound of noticing something — \"ah\"","audio_url":"https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/audio/3042.wav"}
+- `[item:371]` **typing** — {"audio":"ああ","answer":"ああ","prompt":"The same, drawn out — also \"like that\"","audio_url":"https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/audio/3042-3042.wav"}
 
 ##### い &nbsp; `[lesson:2]`
 _i_
@@ -89,8 +89,8 @@ _i_
 **Set 3** &nbsp; `[set:2.3]`
 
 - `[item:372]` **lecture** — い is "ee". On its own it spells a few uncommon nouns, but you will meet those written in kanji rather than kana — leave them for later. Written twice, though, you get いい: "good", "fine", one of the most common words in the language. Say both characters fully — i-i, two beats — not one long "ee". And now that you have あ and い, you can write あい: love. This is how the rest of the course works — every new character opens up the words it can spell with the ones you already have.
-- `[item:373]` **typing** — {"audio":"いい","answer":"いい","prompt":"Good, fine — two beats, not one long sound"}
-- `[item:374]` **typing** — {"audio":"あい","answer":"あい","prompt":"Love — your first two characters together"}
+- `[item:373]` **typing** — {"audio":"いい","answer":"いい","prompt":"Good, fine — two beats, not one long sound","audio_url":"https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/audio/3044-3044.wav"}
+- `[item:374]` **typing** — {"audio":"あい","answer":"あい","prompt":"Love — your first two characters together","audio_url":"https://pdczkqzshxsqkrnbmsmw.supabase.co/storage/v1/object/public/bakaworks/audio/3042-3044.wav"}
 
 ##### う &nbsp; `[lesson:3]`
 _u_

@@ -97,14 +97,20 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
 
 ## Known problems, roughly by weight
 
-1. **Audio has no fallback.** Every character drill is a listening or trace exercise that
-   speaks via `speechSynthesis` with `ja-JP`. A machine without a Japanese voice gets
-   silence, and the question becomes unanswerable. Real recordings in `content.audio_url`
-   is the fix — the player already prefers a URL when present.
-2. **KanjiVG attribution is missing.** All stroke data comes from
-   [KanjiVG](http://kanjivg.tagaini.net), Copyright (C) Ulrich Apel, **CC BY-SA 3.0**. That
-   licence requires visible attribution and share-alike. 20 characters' worth is in the
-   database now. Not yet decided how to handle it.
+1. **Attribution is missing, and there are now two debts.** Neither is optional.
+   - **KanjiVG** — all stroke data, Copyright (C) Ulrich Apel, **CC BY-SA 3.0**, which
+     requires visible attribution and share-alike.
+   - **VOICEVOX:冥鳴ひまり** — every audio file. Commercial use is free *with* that credit
+     line displayed; her terms ask for nothing else, no application and no reporting.
+     Other characters are stricter, which is why she was chosen — 青山龍星 sounded better
+     but limits commercial use to registered businesses and needs prior permission.
+
+   One credits page settles both. It does not exist yet.
+2. **Lecture audio still has no fallback.** Characters and words now play real files, but
+   lecture text is spoken run-by-run in the browser by `SpeakableText`, so there is no
+   single string to attach a recording to — a machine with no Japanese voice hears
+   nothing when tapping Japanese inside a lecture. Fixing it means changing how lectures
+   are authored or stored, not just generating more audio.
 3. **Gold is farmable.** Finishing a set pays 5 gold every time, including replays, and
    `completeSet` fires from a `useEffect` — so refreshing the completion screen pays again.
    Needs a daily cap or a reduced repeat payout.
@@ -121,6 +127,21 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
    fails at `/admin/vocabulary` without it.
 10. Commit `e0e6786` has a stray `@` on the first line of its message (a PowerShell
     here-string run through bash). Cosmetic; fixing needs a force push.
+
+## Audio
+
+Every character, word and listening prompt plays a real file. `scripts/generate-audio.js`
+reads what each set says, renders it with **VOICEVOX running locally on your own PC**,
+uploads it to the `bakaworks` bucket and writes the URL into `content.audio_url`.
+
+- VOICEVOX is a build-time tool only. It is not a dependency, not in `package.json`, and
+  never runs on Vercel — the app just fetches a `.wav` like any other file.
+- One file per distinct sound, not per set: あ is spoken by eight sets and is one file,
+  named by codepoint (`3042.wav`) so no Japanese ever reaches a filename or a URL.
+- Re-runnable and idempotent. Add characters, start VOICEVOX, run it again.
+- `--list` shows the voices, `--dry` shows what would be made without the engine running.
+
+Lectures are deliberately excluded — see known problem 2.
 
 ## Adding the next characters
 

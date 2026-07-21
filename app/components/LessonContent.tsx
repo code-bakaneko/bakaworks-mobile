@@ -56,19 +56,27 @@ export default async function LessonContent({
     // Every set this lesson has, in order.
     const setNumbers = [...new Set(lesson.lesson_sets.map((s) => s.set_number))].sort((a, b) => a - b);
 
-    // Which of them this user has already finished.
+    // Which of them this user has already finished, oldest play first.
     const { data: completions } = await supabase
         .from("set_completions")
-        .select("set_number")
-        .eq("lesson_id", id);
+        .select("set_number, completed_at")
+        .eq("lesson_id", id)
+        .order("completed_at");
     const done = new Set(completions?.map((c) => c.set_number));
 
-    // Play the first unfinished set. Once every set is done, re-entering the
-    // lesson replays the first one as practice.
+    // Once the whole lesson is finished, entering it again cycles: the set
+    // played longest ago comes up next, and finishing it sends it to the back
+    // of the queue. completed_at is re-stamped on every play, so the order
+    // rotates on its own with nothing extra to store.
+    const stalest = completions
+        ?.map((c) => c.set_number)
+        .find((n) => setNumbers.includes(n));
+
+    // Play the first unfinished set while any remain.
     const activeSet =
         forceSet !== undefined && setNumbers.includes(forceSet)
             ? forceSet
-            : setNumbers.find((n) => !done.has(n)) ?? setNumbers[0];
+            : setNumbers.find((n) => !done.has(n)) ?? stalest ?? setNumbers[0];
 
     const isReplay = done.has(activeSet);
 
