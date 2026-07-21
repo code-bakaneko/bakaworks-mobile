@@ -45,37 +45,42 @@ export async function signOut() {
   redirect('/')
 }
 
-/** Gold paid every time a lesson is completed, replays included. */
-const GOLD_PER_LESSON = 5
+/** Gold paid every time a set is finished, replays included. */
+const GOLD_PER_SET = 5
 
-export async function completeLesson(lessonId: number) {
+/**
+ * Records one finished set. A lesson is only complete once every one of its
+ * sets has been recorded — that is what unlocks the next lesson.
+ */
+export async function completeSet(lessonId: number, setNumber: number) {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const userId = data?.claims.sub
   if (!userId) return
 
-  // ignoreDuplicates makes this ON CONFLICT DO NOTHING, so a repeat completion
+  // ignoreDuplicates makes this ON CONFLICT DO NOTHING, so replaying a set
   // is recorded harmlessly. It needs only the insert policy — a real upsert
-  // would also require an update policy on lesson_completions.
+  // would also require an update policy on set_completions.
   await supabase
-    .from('lesson_completions')
+    .from('set_completions')
     .upsert(
-      { user_id: userId, lesson_id: lessonId },
-      { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
+      { user_id: userId, lesson_id: lessonId, set_number: setNumber },
+      { onConflict: 'user_id,lesson_id,set_number', ignoreDuplicates: true }
     )
 
-  // Gold is paid on EVERY completion, including replays of a finished lesson.
+  // Gold is paid on EVERY finished set, including replays.
   // profiles has no update policy on purpose, so the award runs through the
   // secret key. award_gold increments atomically inside Postgres and returns
   // the new balance.
   const { data: balance } = await supabaseAdmin.rpc('award_gold', {
     p_user_id: userId,
-    p_amount: GOLD_PER_LESSON,
+    p_amount: GOLD_PER_SET,
   })
 
-  // The gold counter lives in the learn layout's top bar.
+  // The gold counter lives in the learn layout's top bar, and the star map
+  // needs to reflect the new progress.
   revalidatePath('/learn', 'layout')
 
   // Returned so the completion screen can show what was earned.
-  return { earned: GOLD_PER_LESSON, balance }
+  return { earned: GOLD_PER_SET, balance }
 }

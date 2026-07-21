@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
 import KanaTracer from "./KanaTracer";
-import { completeLesson } from "@/app/lib/actions";
+import { completeSet } from "@/app/lib/actions";
 
 type LessonSet = Tables<"lesson_sets">;
 
@@ -29,10 +29,18 @@ type SetContent = {
 export default function LessonPlayer({
     lessonId,
     lessonName,
+    setNumber,
+    setPosition,
+    setTotal,
+    isReplay,
     sets,
 }: {
     lessonId: number;
     lessonName: string;
+    setNumber: number;
+    setPosition: number;
+    setTotal: number;
+    isReplay: boolean;
     sets: LessonSet[];
 }) {
     const [index, setIndex] = useState(0);
@@ -48,21 +56,23 @@ export default function LessonPlayer({
     const isTrace = set?.type === "trace";
     const isCorrect = checked && selected === content.answer;
     const finished = index >= sets.length;
+    // Replaying an already-finished set never "completes the lesson".
+    const lastSet = setPosition === setTotal && !isReplay;
 
     const [reward, setReward] = useState<{ earned: number; balance: number | null } | null>(null);
 
-    // Record completion once the player reaches the end. This unlocks the next
-    // lesson on the star map and pays out the gold it returns.
+    // Record this set once the player reaches the end. The lesson only counts
+    // as complete — and the next star only unlocks — when every set is done.
     useEffect(() => {
         if (!finished) return;
 
         let cancelled = false;
-        completeLesson(lessonId).then((result) => {
+        completeSet(lessonId, setNumber).then((result) => {
             if (!cancelled && result) setReward(result);
         });
 
         return () => { cancelled = true };
-    }, [finished, lessonId]);
+    }, [finished, lessonId, setNumber]);
 
     function advance() {
         if (isQuestion && !checked) {
@@ -83,8 +93,15 @@ export default function LessonPlayer({
         return (
             <div className="starfield lesson-enter min-h-screen
                 flex flex-col items-center justify-center gap-6 text-center px-6">
-                <span className="text-6xl">🌟</span>
-                <h2 className="text-3xl font-extrabold">Lesson Complete</h2>
+                <span className="text-6xl">{lastSet ? "🌟" : "✨"}</span>
+                <h2 className="text-3xl font-extrabold">
+                    {lastSet ? "Lesson Complete" : `Set ${setPosition} Complete`}
+                </h2>
+                <p className="text-muted">
+                    {lastSet
+                        ? `${lessonName} — all ${setTotal} sets finished.`
+                        : `${setTotal - setPosition} more ${setTotal - setPosition === 1 ? "set" : "sets"} in ${lessonName}. Come back in to keep going.`}
+                </p>
                 {questionCount > 0 && (
                     <p className="text-muted">
                         You got <span className="text-brand font-bold">{score}</span> of {questionCount} right.
@@ -134,8 +151,8 @@ export default function LessonPlayer({
                         className="h-full bg-brand rounded-full transition-all duration-300"
                         style={{ width: `${progress}%` }} />
                 </div>
-                <span className="text-sm text-muted tabular-nums">
-                    {index + 1}/{sets.length}
+                <span className="text-sm text-muted tabular-nums whitespace-nowrap">
+                    Set {setPosition}/{setTotal} · {index + 1}/{sets.length}
                 </span>
             </header>
 

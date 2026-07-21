@@ -101,38 +101,13 @@ export type Database = {
         }
         Relationships: []
       }
-      lesson_completions: {
-        Row: {
-          completed_at: string
-          lesson_id: number
-          user_id: string
-        }
-        Insert: {
-          completed_at?: string
-          lesson_id: number
-          user_id: string
-        }
-        Update: {
-          completed_at?: string
-          lesson_id?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "lesson_completions_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "lessons"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       lesson_sets: {
         Row: {
           content: Json
           created_at: string
           id: number
           lesson_id: number
+          set_number: number
           sort: number
           type: string
         }
@@ -141,6 +116,7 @@ export type Database = {
           created_at?: string
           id?: number
           lesson_id: number
+          set_number?: number
           sort: number
           type: string
         }
@@ -149,6 +125,7 @@ export type Database = {
           created_at?: string
           id?: number
           lesson_id?: number
+          set_number?: number
           sort?: number
           type?: string
         }
@@ -241,6 +218,35 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      set_completions: {
+        Row: {
+          completed_at: string
+          lesson_id: number
+          set_number: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          lesson_id: number
+          set_number: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          lesson_id?: number
+          set_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "set_completions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subjects: {
         Row: {

@@ -9,28 +9,41 @@ export default async function LearnPage() {
         .from("units")
         // Both joins are inner: a lesson with no sets is a dead link, and a
         // unit with no playable lessons is an empty sky.
-        .select("*, lessons!inner(*, lesson_sets!inner(id))")
+        .select("*, lessons!inner(*, lesson_sets!inner(set_number))")
         .eq("course_id", 1)
         .order("id")
         .order("id", { referencedTable: "lessons" });
 
     if (error) return <div className="p-10 text-muted">Could not load the course.</div>;
 
-    // Which lessons this user has finished.
+    // Every set this user has finished, keyed "lessonId:setNumber".
     const { data: completions } = await supabase
-        .from("lesson_completions")
-        .select("lesson_id");
-    const completed = new Set(completions?.map((c) => c.lesson_id));
+        .from("set_completions")
+        .select("lesson_id, set_number");
+    const doneSets = new Set(completions?.map((c) => `${c.lesson_id}:${c.set_number}`));
+
+    // How many sets each lesson has, and how many of them are done.
+    const progress = new Map<number, { done: number; total: number }>();
+    for (const unit of units ?? []) {
+        for (const lesson of unit.lessons) {
+            const setNumbers = [...new Set(lesson.lesson_sets.map((s) => s.set_number))];
+            progress.set(lesson.id, {
+                done: setNumbers.filter((n) => doneSets.has(`${lesson.id}:${n}`)).length,
+                total: setNumbers.length,
+            });
+        }
+    }
 
     // Walk every lesson in display order (units by id, lessons by id) and mark
-    // each unlocked when the lesson before it is completed. The first lesson of
-    // the course is always open.
+    // each unlocked when ALL sets of the lesson before it are done. The first
+    // lesson of the course is always open.
     const unlocked = new Map<number, boolean>();
     let prevCompleted = true;
     for (const unit of units ?? []) {
         for (const lesson of unit.lessons) {
             unlocked.set(lesson.id, prevCompleted);
-            prevCompleted = completed.has(lesson.id);
+            const p = progress.get(lesson.id)!;
+            prevCompleted = p.done >= p.total;
         }
     }
 
@@ -68,6 +81,12 @@ export default async function LearnPage() {
 
                         {unit.lessons.map((lesson, lessonIndex) => {
                             const locked = !unlocked.get(lesson.id);
+                            const { done, total } = progress.get(lesson.id)!;
+                            const finished = done >= total;
+
+                            const label = locked
+                                ? `${lesson.name} (locked)`
+                                : `${lesson.name} — ${done}/${total} sets`;
 
                             const star = (
                                 <g
@@ -77,7 +96,16 @@ export default async function LearnPage() {
                                     {/* One child only. <title> is a raw text element, so
                                         React's text separator comment would be parsed as
                                         literal text and break hydration. */}
-                                    <title>{locked ? `${lesson.name} (locked)` : lesson.name}</title>
+                                    <title>{label}</title>
+
+                                    {/* Progress ring: how many sets of this lesson are done. */}
+                                    {!locked && total > 1 && (
+                                        <circle
+                                            r="14" fill="none" strokeWidth="2.5"
+                                            strokeDasharray={`${(done / total) * 88} 88`}
+                                            transform="rotate(-90)"
+                                            className={finished ? "stroke-green-400" : "stroke-brand/70"} />
+                                    )}
                                     <path d={STAR_PATH}
                                         className={locked ? "fill-slate-600" : "fill-brand"} />
                                 </g>
