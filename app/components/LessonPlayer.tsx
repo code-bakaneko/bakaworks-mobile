@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
+import KanaTracer from "./KanaTracer";
 import { completeLesson } from "@/app/lib/actions";
 
 type LessonSet = Tables<"lesson_sets">;
@@ -18,6 +19,11 @@ type SetContent = {
     // Audio is opt-in: the speaker button only renders when one of these is set.
     audio?: string;      // text spoken with the browser's Japanese voice
     audio_url?: string;  // a real audio file, takes priority when present
+    // trace sets
+    character?: string;
+    romaji?: string;
+    strokes?: string[];
+    viewBox?: string;
 };
 
 export default function LessonPlayer({
@@ -33,18 +39,29 @@ export default function LessonPlayer({
     const [selected, setSelected] = useState<string | null>(null);
     const [checked, setChecked] = useState(false);
     const [score, setScore] = useState(0);
+    const [traced, setTraced] = useState(false);
 
     const set = sets[index];
     const content = (set?.content ?? {}) as SetContent;
     const progress = (index / sets.length) * 100;
     const isQuestion = set?.type === "multiple_choice";
+    const isTrace = set?.type === "trace";
     const isCorrect = checked && selected === content.answer;
     const finished = index >= sets.length;
 
-    // Record completion once the player reaches the end. This is what unlocks
-    // the next lesson on the star map.
+    const [reward, setReward] = useState<{ earned: number; balance: number | null } | null>(null);
+
+    // Record completion once the player reaches the end. This unlocks the next
+    // lesson on the star map and pays out the gold it returns.
     useEffect(() => {
-        if (finished) completeLesson(lessonId);
+        if (!finished) return;
+
+        let cancelled = false;
+        completeLesson(lessonId).then((result) => {
+            if (!cancelled && result) setReward(result);
+        });
+
+        return () => { cancelled = true };
     }, [finished, lessonId]);
 
     function advance() {
@@ -56,6 +73,7 @@ export default function LessonPlayer({
 
         setSelected(null);
         setChecked(false);
+        setTraced(false);
         setIndex((index) => index + 1);
     }
 
@@ -72,6 +90,27 @@ export default function LessonPlayer({
                         You got <span className="text-brand font-bold">{score}</span> of {questionCount} right.
                     </p>
                 )}
+
+                {/* Reserve the height so the layout does not jump when the
+                    award lands a moment after the screen renders. */}
+                <div className="h-24 flex flex-col items-center justify-center gap-1">
+                    {reward && (
+                        <>
+                            <div className="lesson-enter flex items-center gap-3
+                                bg-brand/10 border-2 border-brand rounded-lg px-6 py-3">
+                                <span className="text-3xl leading-none">🪙</span>
+                                <span className="text-2xl font-extrabold text-brand tabular-nums">
+                                    +{reward.earned}
+                                </span>
+                            </div>
+                            {reward.balance !== null && (
+                                <span className="text-sm text-muted tabular-nums">
+                                    {reward.balance} gold total
+                                </span>
+                            )}
+                        </>
+                    )}
+                </div>
                 <Link href="/learn"
                     className="bg-brand px-8 h-12 flex items-center rounded-sm font-extrabold
                         border-b-4 border-brand-dark
@@ -153,6 +192,26 @@ export default function LessonPlayer({
                     </div>
                 )}
 
+                {set.type === "trace" && content.strokes && (
+                    <div className="flex flex-col gap-6 items-center">
+                        <div className="flex flex-col gap-2 text-center">
+                            <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
+                                Trace it
+                            </span>
+                            <p className="text-lg text-muted">
+                                Draw each stroke in order, following the highlighted guide.
+                            </p>
+                        </div>
+                        <KanaTracer
+                            key={set.id}
+                            character={content.character ?? ""}
+                            romaji={content.romaji}
+                            strokes={content.strokes}
+                            viewBox={content.viewBox}
+                            onComplete={() => setTraced(true)} />
+                    </div>
+                )}
+
                 {(set.type === "video" || set.type === "audio") && (
                     <p className="text-muted">
                         {set.type} steps are not supported yet — {content.url}
@@ -174,7 +233,7 @@ export default function LessonPlayer({
 
                     <button
                         onClick={advance}
-                        disabled={isQuestion && selected === null}
+                        disabled={(isQuestion && selected === null) || (isTrace && !traced)}
                         className="bg-brand px-10 h-12 rounded-sm font-extrabold
                             border-b-4 border-brand-dark
                             hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer

@@ -45,8 +45,8 @@ export async function signOut() {
   redirect('/')
 }
 
-/** Gold paid the first time a lesson is completed. */
-const GOLD_PER_LESSON = 10
+/** Gold paid every time a lesson is completed, replays included. */
+const GOLD_PER_LESSON = 5
 
 export async function completeLesson(lessonId: number) {
   const supabase = await createClient()
@@ -54,22 +54,28 @@ export async function completeLesson(lessonId: number) {
   const userId = data?.claims.sub
   if (!userId) return
 
-  // A plain insert, not an upsert: the primary key conflict is how we know
-  // this lesson was already finished. Replaying the completion screen must
-  // not pay out twice.
-  const { error } = await supabase
+  // ignoreDuplicates makes this ON CONFLICT DO NOTHING, so a repeat completion
+  // is recorded harmlessly. It needs only the insert policy — a real upsert
+  // would also require an update policy on lesson_completions.
+  await supabase
     .from('lesson_completions')
-    .insert({ user_id: userId, lesson_id: lessonId })
+    .upsert(
+      { user_id: userId, lesson_id: lessonId },
+      { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
+    )
 
-  if (error) return
-
+  // Gold is paid on EVERY completion, including replays of a finished lesson.
   // profiles has no update policy on purpose, so the award runs through the
-  // secret key. award_gold increments atomically inside Postgres.
-  await supabaseAdmin.rpc('award_gold', {
+  // secret key. award_gold increments atomically inside Postgres and returns
+  // the new balance.
+  const { data: balance } = await supabaseAdmin.rpc('award_gold', {
     p_user_id: userId,
     p_amount: GOLD_PER_LESSON,
   })
 
   // The gold counter lives in the learn layout's top bar.
   revalidatePath('/learn', 'layout')
+
+  // Returned so the completion screen can show what was earned.
+  return { earned: GOLD_PER_LESSON, balance }
 }

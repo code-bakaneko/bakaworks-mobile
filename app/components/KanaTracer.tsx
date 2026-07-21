@@ -1,0 +1,210 @@
+'use client'
+
+import { useRef, useState } from "react";
+
+/** How far off the guide a finger may stray, in viewBox units. Generous on
+ *  purpose — this teaches stroke ORDER and DIRECTION, not penmanship. */
+const TOLERANCE = 14;
+
+/** Fraction of the guide stroke that must be covered to accept it. */
+const REQUIRED_COVERAGE = 0.8;
+
+/** Points sampled along each guide stroke when checking a drawing. */
+const SAMPLES = 40;
+
+type Point = { x: number; y: number };
+
+export default function KanaTracer({
+    character,
+    romaji,
+    strokes,
+    viewBox = "0 0 109 109",
+    onComplete,
+}: {
+    character: string;
+    romaji?: string;
+    strokes: string[];
+    viewBox?: string;
+    onComplete?: () => void;
+}) {
+    const svgRef = useRef<SVGSVGElement>(null);
+    const guideRef = useRef<SVGPathElement>(null);
+
+    const [strokeIndex, setStrokeIndex] = useState(0);
+    const [drawing, setDrawing] = useState<Point[]>([]);
+    const [wrong, setWrong] = useState(false);
+
+    const done = strokeIndex >= strokes.length;
+
+    /** Pointer position in viewBox units, not screen pixels. */
+    function toSvgPoint(event: React.PointerEvent): Point | null {
+        const svg = svgRef.current;
+        if (!svg) return null;
+
+        const matrix = svg.getScreenCTM();
+        if (!matrix) return null;
+
+        const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+        return { x: point.x, y: point.y };
+    }
+
+    /**
+     * Walks the guide stroke from start to finish and checks the drawing
+     * visits it in order. A single pass over the samples means a stroke drawn
+     * backwards fails even though it covers the same pixels.
+     */
+    function isStrokeCorrect(points: Point[]): boolean {
+        const guide = guideRef.current;
+        if (!guide || points.length < 2) return false;
+
+        const length = guide.getTotalLength();
+        let matched = 0;
+        let cursor = 0;
+
+        for (let i = 0; i <= SAMPLES; i++) {
+            const target = guide.getPointAtLength((i / SAMPLES) * length);
+
+            // Only look forward through the drawing, never back.
+            for (let j = cursor; j < points.length; j++) {
+                const dx = points[j].x - target.x;
+                const dy = points[j].y - target.y;
+
+                if (Math.hypot(dx, dy) <= TOLERANCE) {
+                    matched++;
+                    cursor = j;
+                    break;
+                }
+            }
+        }
+
+        return matched / (SAMPLES + 1) >= REQUIRED_COVERAGE;
+    }
+
+    function start(event: React.PointerEvent) {
+        if (done) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setWrong(false);
+
+        const point = toSvgPoint(event);
+        setDrawing(point ? [point] : []);
+    }
+
+    function move(event: React.PointerEvent) {
+        if (done || drawing.length === 0) return;
+
+        const point = toSvgPoint(event);
+        if (point) setDrawing((drawing) => [...drawing, point]);
+    }
+
+    function end() {
+        if (done || drawing.length === 0) return;
+
+        if (isStrokeCorrect(drawing)) {
+            const next = strokeIndex + 1;
+            setStrokeIndex(next);
+            if (next >= strokes.length) onComplete?.();
+        } else {
+            setWrong(true);
+        }
+
+        setDrawing([]);
+    }
+
+    function reset() {
+        setStrokeIndex(0);
+        setDrawing([]);
+        setWrong(false);
+    }
+
+    const drawnPath = drawing.length > 0
+        ? "M" + drawing.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" L")
+        : "";
+
+    return (
+        <div className="flex flex-col items-center gap-4">
+
+            <div className="flex items-center gap-3 text-sm">
+                <span className="text-muted">
+                    {done ? "Complete" : `Stroke ${strokeIndex + 1} of ${strokes.length}`}
+                </span>
+                {romaji && <span className="text-brand font-bold">{romaji}</span>}
+            </div>
+
+            <svg
+                ref={svgRef}
+                viewBox={viewBox}
+                onPointerDown={start}
+                onPointerMove={move}
+                onPointerUp={end}
+                onPointerCancel={end}
+                className={`w-72 h-72 rounded-lg bg-slate-950 touch-none select-none
+                    border-2 transition-colors
+                    ${wrong ? "border-red-500" : done ? "border-green-500" : "border-white/15"}`}>
+
+                {/* Faint grid, the way practice paper is ruled. */}
+                <line x1="54.5" y1="0" x2="54.5" y2="109" strokeWidth="0.5"
+                    strokeDasharray="3 3" className="stroke-white/10" />
+                <line x1="0" y1="54.5" x2="109" y2="54.5" strokeWidth="0.5"
+                    strokeDasharray="3 3" className="stroke-white/10" />
+
+                {/* The whole character, ghosted, so the goal is always visible. */}
+                {strokes.map((d, i) => (
+                    <path key={`ghost-${i}`} d={d} fill="none" strokeWidth="6"
+                        strokeLinecap="round" strokeLinejoin="round"
+                        className="stroke-white/10" />
+                ))}
+
+                {/* Strokes already drawn correctly. */}
+                {strokes.slice(0, strokeIndex).map((d, i) => (
+                    <path key={`done-${i}`} d={d} fill="none" strokeWidth="6"
+                        strokeLinecap="round" strokeLinejoin="round"
+                        className="stroke-brand" />
+                ))}
+
+                {/* The stroke being asked for. Also the measuring path. */}
+                {!done && (
+                    <path ref={guideRef} d={strokes[strokeIndex]} fill="none" strokeWidth="6"
+                        strokeLinecap="round" strokeLinejoin="round"
+                        className="stroke-brand/40" />
+                )}
+
+                {/* Where to begin this stroke. */}
+                {!done && guideRef.current && (
+                    <circle
+                        r="4"
+                        cx={guideRef.current.getPointAtLength(0).x}
+                        cy={guideRef.current.getPointAtLength(0).y}
+                        className="fill-brand animate-pulse" />
+                )}
+
+                {/* The finger's trail. */}
+                {drawnPath && (
+                    <path d={drawnPath} fill="none" strokeWidth="6"
+                        strokeLinecap="round" strokeLinejoin="round"
+                        className="stroke-white/70" />
+                )}
+            </svg>
+
+            <div className="h-6 flex items-center">
+                {wrong && (
+                    <span className="text-red-400 text-sm font-bold">
+                        Follow the highlighted stroke from the dot.
+                    </span>
+                )}
+                {done && (
+                    <span className="text-green-400 text-sm font-bold">
+                        {character} — all {strokes.length} strokes correct.
+                    </span>
+                )}
+            </div>
+
+            <button
+                type="button"
+                onClick={reset}
+                className="text-sm text-muted hover:text-white transition-colors hover:cursor-pointer">
+                Start over
+            </button>
+
+        </div>
+    )
+}
