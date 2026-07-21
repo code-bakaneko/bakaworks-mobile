@@ -94,3 +94,69 @@ export function toRomaji(run: string): string | null {
 
     return out || null;
 }
+
+export type RomajiToken = { text: string; romaji: string };
+
+/**
+ * Splits a run into per-character pieces with each piece's own reading, for
+ * showing the reading above each character.
+ *
+ * A "character" here is a sound, not a codepoint: きゃ is one token, and a
+ * small tsu joins the character it doubles. Kanji cannot be split reliably —
+ * 漢字 is two characters but its reading is looked up as a whole — so a known
+ * kanji word comes back as a single token.
+ */
+export function toRomajiTokens(run: string): RomajiToken[] | null {
+    if (KANJI[run]) return [{ text: run, romaji: KANJI[run] }];
+
+    const tokens: RomajiToken[] = [];
+
+    for (let i = 0; i < run.length; i++) {
+        const raw = run[i];
+        const ch = toHiragana(raw);
+
+        // Long vowel mark belongs to the sound before it.
+        if (raw === "ー") {
+            const previous = tokens[tokens.length - 1];
+            if (!previous) return null;
+            previous.text += raw;
+            previous.romaji += previous.romaji.slice(-1);
+            continue;
+        }
+
+        // Small tsu doubles the next consonant, so it rides along with it.
+        if (ch === "っ") {
+            const nextRaw = run[i + 1];
+            const next = toHiragana(nextRaw ?? "");
+            const sound = KANA[next];
+            if (!sound) return null;
+
+            const small = SMALL_Y[toHiragana(run[i + 2] ?? "")];
+            const body = small ? sound.replace(/i$/, "") + small : sound;
+
+            tokens.push({
+                text: raw + nextRaw + (small ? run[i + 2] : ""),
+                romaji: sound[0] + body,
+            });
+            i += small ? 2 : 1;
+            continue;
+        }
+
+        const small = SMALL_Y[toHiragana(run[i + 1] ?? "")];
+        const sound = KANA[ch];
+        if (!sound) return null;
+
+        if (small) {
+            tokens.push({
+                text: raw + run[i + 1],
+                romaji: sound.replace(/i$/, "") + small,
+            });
+            i++;
+            continue;
+        }
+
+        tokens.push({ text: raw, romaji: sound });
+    }
+
+    return tokens.length > 0 ? tokens : null;
+}
