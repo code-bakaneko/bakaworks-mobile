@@ -27,7 +27,7 @@ export default async function Home({
             Beta
           </span>
         </Link>
-        <Link href="/learn" className="
+        <Link href="/login" className="
           bg-brand h-10 px-5 flex items-center rounded-sm font-extrabold border-b-4 border-brand-dark
           hover:border-b-0 hover:translate-y-1 transition-all">
           Log In
@@ -110,7 +110,7 @@ export default async function Home({
                   hover:border-b-0 hover:translate-y-1 transition-all">
                 Sign Up
               </button>
-              <Link href="/learn" className="text-sm text-muted hover:text-white text-center mt-1
+              <Link href="/login" className="text-sm text-muted hover:text-white text-center mt-1
                 transition-colors">
                 Already have an account? Log in
               </Link>

@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "../lib/actions"
 
 export default function LearnSidebar() {
     const pathname = usePathname();
@@ -21,6 +22,13 @@ export default function LearnSidebar() {
                     {link.name}
                 </Link>
             ))}
+            <form action={signOut} className="mt-auto">
+                <button type="submit"
+                    className="w-full text-left px-3 py-2 rounded-sm transition-all
+                        text-muted hover:text-white hover:bg-red-500/20 hover:cursor-pointer">
+                    Log Out
+                </button>
+            </form>
         </aside>
     )
 }
