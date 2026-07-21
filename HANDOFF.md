@@ -75,6 +75,15 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
 - **Lesson locks are enforced in `LessonContent`, not the map.** Hiding a star only stops it
   being clicked; the route is reachable by URL. Both call `getCourseProgress()` in
   `app/lib/progress.ts` so they cannot disagree.
+- **`set_completions` inserts are checked against the course, not just the user.** The
+  policy verifies the set exists and that `is_lesson_unlocked()` says the learner has
+  reached it. Before that, the check was `auth.uid() = user_id` alone — the lesson id came
+  from the caller, so posting rows for every lesson opened the whole course without
+  playing any of it. `completeSet` writes with the USER's client for exactly this reason:
+  using the secret key there would bypass the policy and restore the hole.
+- **`is_lesson_unlocked()` takes no user argument on purpose.** It reads `auth.uid()`
+  itself, so it cannot be asked about anyone else. It mirrors `getCourseProgress()` in
+  `app/lib/progress.ts` — if the two ever drift, this one wins.
 - **`profiles` has no update policy on purpose.** Gold is awarded by `award_gold()`, a
   `SECURITY DEFINER` function with EXECUTE revoked from anon and authenticated, called only
   from a server action with the secret key. A user who could write their own balance could

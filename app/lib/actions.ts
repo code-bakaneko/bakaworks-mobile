@@ -90,12 +90,22 @@ export async function completeSet(lessonId: number, setNumber: number) {
   // ignoreDuplicates makes this ON CONFLICT DO NOTHING, so replaying a set
   // is recorded harmlessly. It needs only the insert policy — a real upsert
   // would also require an update policy on set_completions.
-  await supabase
+  //
+  // Deliberately through the USER's client, not the admin one: the insert
+  // policy is what checks the set exists and the lesson has actually been
+  // reached. Writing this with the secret key would skip that check and hand
+  // back the hole the policy was added to close.
+  const { error } = await supabase
     .from('set_completions')
     .upsert(
       { user_id: userId, lesson_id: lessonId, set_number: setNumber },
       { onConflict: 'user_id,lesson_id,set_number', ignoreDuplicates: true }
     )
+
+  // A rejected write must not be rewarded. `lessonId` and `setNumber` arrive
+  // from the browser, so this is reachable with anything in them; before the
+  // check existed, a refused insert still paid out.
+  if (error) return
 
   // Stamp it as the most recently played. Once every set of a lesson is
   // done, re-entering plays whichever was played longest ago, so the sets
