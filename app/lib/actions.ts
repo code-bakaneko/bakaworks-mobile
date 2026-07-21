@@ -1,7 +1,9 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { createClient } from './supabase/server'
+import { supabaseAdmin } from './supabase/admin'
 
 export async function signUp(formData: FormData) {
   const email = formData.get('email') as string
@@ -43,17 +45,31 @@ export async function signOut() {
   redirect('/')
 }
 
+/** Gold paid the first time a lesson is completed. */
+const GOLD_PER_LESSON = 10
+
 export async function completeLesson(lessonId: number) {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const userId = data?.claims.sub
   if (!userId) return
 
-  // Idempotent: replaying the completion screen must not error on the PK.
-  await supabase
+  // A plain insert, not an upsert: the primary key conflict is how we know
+  // this lesson was already finished. Replaying the completion screen must
+  // not pay out twice.
+  const { error } = await supabase
     .from('lesson_completions')
-    .upsert(
-      { user_id: userId, lesson_id: lessonId },
-      { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
-    )
+    .insert({ user_id: userId, lesson_id: lessonId })
+
+  if (error) return
+
+  // profiles has no update policy on purpose, so the award runs through the
+  // secret key. award_gold increments atomically inside Postgres.
+  await supabaseAdmin.rpc('award_gold', {
+    p_user_id: userId,
+    p_amount: GOLD_PER_LESSON,
+  })
+
+  // The gold counter lives in the learn layout's top bar.
+  revalidatePath('/learn', 'layout')
 }

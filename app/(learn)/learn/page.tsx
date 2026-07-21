@@ -74,7 +74,10 @@ export default async function LearnPage() {
                                     transform={`translate(${lesson.x}, ${lesson.y}) scale(0.6)`}
                                     className={locked ? "" : "star-glow"}
                                     style={locked ? undefined : { animationDelay: `${(lessonIndex % 5) * 0.8}s` }}>
-                                    <title>{lesson.name}{locked ? " (locked)" : ""}</title>
+                                    {/* One child only. <title> is a raw text element, so
+                                        React's text separator comment would be parsed as
+                                        literal text and break hydration. */}
+                                    <title>{locked ? `${lesson.name} (locked)` : lesson.name}</title>
                                     <path d={STAR_PATH}
                                         className={locked ? "fill-slate-600" : "fill-brand"} />
                                 </g>
