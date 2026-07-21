@@ -36,7 +36,44 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  await supabase.auth.getClaims()
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims
+
+  const pathname = request.nextUrl.pathname
+
+  // Gate the app routes: anyone not logged in gets bounced to /login.
+  const protectedPrefixes = ['/learn', '/vocabulary', '/characters', '/lesson', '/admin']
+  const isProtected = protectedPrefixes.some((prefix) => pathname.startsWith(prefix))
+
+  if (isProtected && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // /admin is stricter: logged in is not enough, the profile role must be admin.
+  if (pathname.startsWith('/admin') && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.sub)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/learn'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Inverse gate: a logged-in user has no business on the landing page or
+  // login screen — send them straight into the app.
+  const authRoutes = ['/', '/login']
+  if (user && authRoutes.includes(pathname)) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/learn'
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }

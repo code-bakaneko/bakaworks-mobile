@@ -149,7 +149,7 @@ export type Database = {
         Insert: {
           blurb?: string | null
           created_at?: string | null
-          id?: never
+          id?: number
           name: string
           unit_id: number
           x?: number
@@ -158,7 +158,7 @@ export type Database = {
         Update: {
           blurb?: string | null
           created_at?: string | null
-          id?: never
+          id?: number
           name?: string
           unit_id?: number
           x?: number
@@ -173,6 +173,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: []
       }
       schools: {
         Row: {
