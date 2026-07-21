@@ -1,5 +1,22 @@
 import { createClient } from "@/app/lib/supabase/server"
 
+/**
+ * Particles for the progress sparkler. Fixed set, computed once: uneven
+ * distances and staggered delays so it reads as a firework rather than a
+ * pulsing ring.
+ */
+const SPARKS = Array.from({ length: 10 }, (_, i) => {
+    const angle = (i / 10) * Math.PI * 2;
+    const distance = 3.5 + (i % 3) * 1.4;
+
+    return {
+        dx: +(Math.cos(angle) * distance).toFixed(2),
+        dy: +(Math.sin(angle) * distance).toFixed(2),
+        r: i % 3 === 0 ? 0.6 : 0.42,
+        delay: +((i % 5) * 0.16).toFixed(2),
+    };
+});
+
 export default async function LearnPage() {
     const supabase = await createClient();
     const STAR_PATH =
@@ -142,6 +159,25 @@ export default async function LearnPage() {
                                                 stroke="#ffffff"
                                                 strokeOpacity={seg.lit ? 0.85 : 0.2} />
                                         ))
+                                    )}
+
+                                    {/* Sparkler at the leading edge — where progress
+                                        has actually reached. Only while the lesson is
+                                        underway; a finished path has no frontier. */}
+                                    {!fromDone && from.done > 0 && (
+                                        <g transform={`translate(${segments[from.done - 1].x2}, ${segments[from.done - 1].y2})`}>
+                                            {SPARKS.map((spark, k) => (
+                                                <circle key={k}
+                                                    r={spark.r}
+                                                    className={`spark-particle ${k % 3 === 0 ? "fill-brand" : "fill-white"}`}
+                                                    style={{
+                                                        "--dx": `${spark.dx}px`,
+                                                        "--dy": `${spark.dy}px`,
+                                                        animationDelay: `${spark.delay}s`,
+                                                    } as React.CSSProperties} />
+                                            ))}
+                                            <circle r="1.1" className="spark-core fill-white" />
+                                        </g>
                                     )}
                                 </g>
                             );
