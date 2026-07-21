@@ -11,6 +11,8 @@ export type MapLesson = {
     done: number;
     total: number;
     locked: boolean;
+    /** A lecture set has been finished, so there is something to re-read. */
+    hasGuide: boolean;
 };
 
 const STAR_PATH =
@@ -215,14 +217,29 @@ export default function StarMap({ lessons }: { lessons: MapLesson[] }) {
                                 Finish the lesson before this one first.
                             </span>
                         ) : (
-                            <Link
-                                href={`/lesson/${open.id}`}
-                                className="bg-brand h-11 rounded-sm font-extrabold
-                                    flex items-center justify-center
-                                    border-b-4 border-brand-dark
-                                    hover:border-b-0 hover:translate-y-1 transition-all">
-                                {open.done > 0 && open.done < open.total ? "Continue" : "Start lesson"}
-                            </Link>
+                            <>
+                                {/* Only once a lecture has actually been played.
+                                    Nothing to review before then. */}
+                                {open.hasGuide && (
+                                    <Link
+                                        href={`/lesson/${open.id}/guide`}
+                                        className="h-11 rounded-sm font-extrabold
+                                            flex items-center justify-center gap-2
+                                            border-2 border-brand text-brand
+                                            hover:bg-brand/15 transition-colors">
+                                        📖 Guide
+                                    </Link>
+                                )}
+
+                                <Link
+                                    href={`/lesson/${open.id}`}
+                                    className="bg-brand h-11 rounded-sm font-extrabold
+                                        flex items-center justify-center
+                                        border-b-4 border-brand-dark
+                                        hover:border-b-0 hover:translate-y-1 transition-all">
+                                    Start lesson
+                                </Link>
+                            </>
                         )}
                     </div>
                 </>

@@ -7,6 +7,8 @@ export type CourseProgress = {
     progress: Map<number, LessonProgress>;
     /** lessonId -> may this user enter it */
     unlocked: Map<number, boolean>;
+    /** lessonId -> has this user finished a set that contained a lecture */
+    guides: Map<number, boolean>;
 };
 
 /**
@@ -24,7 +26,9 @@ export async function getCourseProgress(courseId: number): Promise<CourseProgres
 
     const { data: units } = await supabase
         .from("units")
-        .select("id, lessons!inner(id, lesson_sets!inner(set_number))")
+        // `type` comes along so a lesson can say whether it has a guide to
+        // read — a guide exists once a set containing a lecture is finished.
+        .select("id, lessons!inner(id, lesson_sets!inner(set_number, type))")
         .eq("course_id", courseId)
         .order("id")
         .order("id", { referencedTable: "lessons" });
@@ -37,6 +41,7 @@ export async function getCourseProgress(courseId: number): Promise<CourseProgres
 
     const progress = new Map<number, LessonProgress>();
     const unlocked = new Map<number, boolean>();
+    const guides = new Map<number, boolean>();
 
     let previousComplete = true;
 
@@ -49,13 +54,23 @@ export async function getCourseProgress(courseId: number): Promise<CourseProgres
                 total: setNumbers.length,
             };
 
+            // A lecture only becomes reviewable once the set holding it has
+            // been played. Reading it early would skip past the exercise.
+            const lectureSets = new Set(
+                lesson.lesson_sets.filter((s) => s.type === "lecture").map((s) => s.set_number)
+            );
+
             progress.set(lesson.id, state);
             unlocked.set(lesson.id, previousComplete);
+            guides.set(
+                lesson.id,
+                [...lectureSets].some((n) => doneSets.has(`${lesson.id}:${n}`))
+            );
             previousComplete = state.done >= state.total;
         }
     }
 
-    return { progress, unlocked };
+    return { progress, unlocked, guides };
 }
 
 /** The course a lesson belongs to, via its unit. */

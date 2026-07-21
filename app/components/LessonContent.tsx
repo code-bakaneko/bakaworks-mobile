@@ -70,7 +70,15 @@ export default async function LessonContent({
             ? forceSet
             : setNumbers.find((n) => !done.has(n)) ?? setNumbers[0];
 
-    const items = lesson.lesson_sets.filter((s) => s.set_number === activeSet);
+    const isReplay = done.has(activeSet);
+
+    const all = lesson.lesson_sets.filter((s) => s.set_number === activeSet);
+
+    // Replaying is practice, not teaching. The lecture has been read once and
+    // now lives in the guide, so drop it and go straight to the exercises.
+    // Preview keeps everything — an admin is checking the content itself.
+    const drilled = all.filter((s) => s.type !== "lecture");
+    const items = isReplay && !preview && drilled.length > 0 ? drilled : all;
 
     return (
         <LessonPlayer
@@ -79,7 +87,7 @@ export default async function LessonContent({
             setNumber={activeSet}
             setPosition={setNumbers.indexOf(activeSet) + 1}
             setTotal={setNumbers.length}
-            isReplay={done.has(activeSet)}
+            isReplay={isReplay}
             sets={items}
             preview={preview}
         />

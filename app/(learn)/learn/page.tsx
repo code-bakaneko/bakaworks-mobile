@@ -20,7 +20,7 @@ export default async function LearnPage() {
 
     // The same computation the lesson route gates on, so the map can never
     // show a star as open that the route would then refuse.
-    const { progress, unlocked } = await getCourseProgress(COURSE_ID);
+    const { progress, unlocked, guides } = await getCourseProgress(COURSE_ID);
 
     return (
         <div className="starfield min-h-screen flex flex-col items-center gap-16 py-12 px-6">
@@ -37,6 +37,7 @@ export default async function LearnPage() {
                         done,
                         total,
                         locked: !unlocked.get(lesson.id),
+                        hasGuide: guides.get(lesson.id) ?? false,
                     };
                 });
 
