@@ -27,10 +27,10 @@ _School of Language_
 ### Japanese &nbsp; `[course:1]`
 _Hiragana, katakana, kanji, and the vocabulary to use them_
 
-3 unit(s), 10 lesson(s).
+3 unit(s), 20 lesson(s).
 
-#### Unit — Hiragana &nbsp; `[unit:1]`
-_The first alphabet. 46 characters that spell every sound in Japanese._
+#### Unit — Hiragana Part 1 &nbsp; `[unit:1]`
+_Your first ten characters — the vowels and the K row._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
@@ -216,10 +216,191 @@ _ko_
 - `[item:287]` **trace** — こ (ko), 2 strokes
 - `[item:288]` **trace** — こ (ko), 2 strokes
 
-#### Unit — Aisatsu &nbsp; `[unit:2]`
-_Greetings and introductions. The words you will use on day one._
+#### Unit — Hiragana Part 2 &nbsp; `[unit:2]`
+_Ten more characters — the S and T rows._
 
-_No lessons yet._
+| Lesson | Name | Sets | Items | x,y |
+|--------|------|------|-------|-----|
+| 11 | さ | 2 | 8 | 32,44 |
+| 12 | し | 2 | 8 | 46,58 |
+| 13 | す | 2 | 8 | 60,42 |
+| 14 | せ | 2 | 8 | 68,66 |
+| 15 | そ | 2 | 8 | 58,88 |
+| 16 | た | 2 | 8 | 70,116 |
+| 17 | ち | 2 | 8 | 64,146 |
+| 18 | つ | 2 | 8 | 40,152 |
+| 19 | て | 2 | 8 | 30,120 |
+| 20 | と | 2 | 8 | 36,88 |
+
+##### さ &nbsp; `[lesson:11]`
+_sa_
+
+**Set 1** &nbsp; `[set:11.1]`
+
+- `[item:289]` **lecture** — さ is "sa". Three strokes: a short horizontal, then a curve down, then a small hook. In print the lower part often looks joined, but by hand it is written as two separate pieces.
+- `[item:290]` **trace** — さ (sa), 3 strokes
+
+**Set 2** &nbsp; `[set:11.2]`
+
+- `[item:291]` **trace** — さ (sa), 3 strokes
+- `[item:292]` **trace** — さ (sa), 3 strokes
+- `[item:293]` **trace** — さ (sa), 3 strokes
+- `[item:294]` **trace** — さ (sa), 3 strokes
+- `[item:295]` **trace** — さ (sa), 3 strokes
+- `[item:296]` **trace** — さ (sa), 3 strokes
+
+##### し &nbsp; `[lesson:12]`
+_shi_
+
+**Set 1** &nbsp; `[set:12.1]`
+
+- `[item:297]` **lecture** — し is "shi" — not "si". Japanese has no "si" sound at all, so this one breaks the pattern. One stroke: straight down, then a gentle sweep up to the right.
+- `[item:298]` **trace** — し (shi), 1 strokes
+
+**Set 2** &nbsp; `[set:12.2]`
+
+- `[item:299]` **trace** — し (shi), 1 strokes
+- `[item:300]` **trace** — し (shi), 1 strokes
+- `[item:301]` **trace** — し (shi), 1 strokes
+- `[item:302]` **trace** — し (shi), 1 strokes
+- `[item:303]` **trace** — し (shi), 1 strokes
+- `[item:304]` **trace** — し (shi), 1 strokes
+
+##### す &nbsp; `[lesson:13]`
+_su_
+
+**Set 1** &nbsp; `[set:13.1]`
+
+- `[item:305]` **lecture** — す is "su". Two strokes: a short horizontal, then a long vertical that loops at the bottom and tails off. The loop sits left of the vertical line, not centred on it.
+- `[item:306]` **trace** — す (su), 2 strokes
+
+**Set 2** &nbsp; `[set:13.2]`
+
+- `[item:307]` **trace** — す (su), 2 strokes
+- `[item:308]` **trace** — す (su), 2 strokes
+- `[item:309]` **trace** — す (su), 2 strokes
+- `[item:310]` **trace** — す (su), 2 strokes
+- `[item:311]` **trace** — す (su), 2 strokes
+- `[item:312]` **trace** — す (su), 2 strokes
+
+##### せ &nbsp; `[lesson:14]`
+_se_
+
+**Set 1** &nbsp; `[set:14.1]`
+
+- `[item:313]` **lecture** — せ is "se". Three strokes: a long horizontal, a vertical crossing it on the left, then a stroke down the right that curves at the base.
+- `[item:314]` **trace** — せ (se), 3 strokes
+
+**Set 2** &nbsp; `[set:14.2]`
+
+- `[item:315]` **trace** — せ (se), 3 strokes
+- `[item:316]` **trace** — せ (se), 3 strokes
+- `[item:317]` **trace** — せ (se), 3 strokes
+- `[item:318]` **trace** — せ (se), 3 strokes
+- `[item:319]` **trace** — せ (se), 3 strokes
+- `[item:320]` **trace** — せ (se), 3 strokes
+
+##### そ &nbsp; `[lesson:15]`
+_so_
+
+**Set 1** &nbsp; `[set:15.1]`
+
+- `[item:321]` **lecture** — そ is "so". One stroke in modern handwriting: a zigzag across the top, then a long diagonal sweeping down to the left. Some printed fonts split the top off — ignore that and write it in one.
+- `[item:322]` **trace** — そ (so), 1 strokes
+
+**Set 2** &nbsp; `[set:15.2]`
+
+- `[item:323]` **trace** — そ (so), 1 strokes
+- `[item:324]` **trace** — そ (so), 1 strokes
+- `[item:325]` **trace** — そ (so), 1 strokes
+- `[item:326]` **trace** — そ (so), 1 strokes
+- `[item:327]` **trace** — そ (so), 1 strokes
+- `[item:328]` **trace** — そ (so), 1 strokes
+
+##### た &nbsp; `[lesson:16]`
+_ta_
+
+**Set 1** &nbsp; `[set:16.1]`
+
+- `[item:329]` **lecture** — た is "ta". Four strokes, the most in this unit. The left side is a cross, the right side a smaller shape beside it. Left side first, top to bottom, then the right.
+- `[item:330]` **trace** — た (ta), 4 strokes
+
+**Set 2** &nbsp; `[set:16.2]`
+
+- `[item:331]` **trace** — た (ta), 4 strokes
+- `[item:332]` **trace** — た (ta), 4 strokes
+- `[item:333]` **trace** — た (ta), 4 strokes
+- `[item:334]` **trace** — た (ta), 4 strokes
+- `[item:335]` **trace** — た (ta), 4 strokes
+- `[item:336]` **trace** — た (ta), 4 strokes
+
+##### ち &nbsp; `[lesson:17]`
+_chi_
+
+**Set 1** &nbsp; `[set:17.1]`
+
+- `[item:337]` **lecture** — ち is "chi" — not "ti". Two strokes: a horizontal, then a curve that drops and swings out. It is た's twin turned around, so compare them carefully.
+- `[item:338]` **trace** — ち (chi), 2 strokes
+
+**Set 2** &nbsp; `[set:17.2]`
+
+- `[item:339]` **trace** — ち (chi), 2 strokes
+- `[item:340]` **trace** — ち (chi), 2 strokes
+- `[item:341]` **trace** — ち (chi), 2 strokes
+- `[item:342]` **trace** — ち (chi), 2 strokes
+- `[item:343]` **trace** — ち (chi), 2 strokes
+- `[item:344]` **trace** — ち (chi), 2 strokes
+
+##### つ &nbsp; `[lesson:18]`
+_tsu_
+
+**Set 1** &nbsp; `[set:18.1]`
+
+- `[item:345]` **lecture** — つ is "tsu" — not "tu". One stroke, a single wide curve like a shallow hook. Its small version っ appears later to double a consonant.
+- `[item:346]` **trace** — つ (tsu), 1 strokes
+
+**Set 2** &nbsp; `[set:18.2]`
+
+- `[item:347]` **trace** — つ (tsu), 1 strokes
+- `[item:348]` **trace** — つ (tsu), 1 strokes
+- `[item:349]` **trace** — つ (tsu), 1 strokes
+- `[item:350]` **trace** — つ (tsu), 1 strokes
+- `[item:351]` **trace** — つ (tsu), 1 strokes
+- `[item:352]` **trace** — つ (tsu), 1 strokes
+
+##### て &nbsp; `[lesson:19]`
+_te_
+
+**Set 1** &nbsp; `[set:19.1]`
+
+- `[item:353]` **lecture** — て is "te". One stroke: start with a short flat top, then drop down and curve left. One of the easiest characters to write in the whole syllabary.
+- `[item:354]` **trace** — て (te), 1 strokes
+
+**Set 2** &nbsp; `[set:19.2]`
+
+- `[item:355]` **trace** — て (te), 1 strokes
+- `[item:356]` **trace** — て (te), 1 strokes
+- `[item:357]` **trace** — て (te), 1 strokes
+- `[item:358]` **trace** — て (te), 1 strokes
+- `[item:359]` **trace** — て (te), 1 strokes
+- `[item:360]` **trace** — て (te), 1 strokes
+
+##### と &nbsp; `[lesson:20]`
+_to_
+
+**Set 1** &nbsp; `[set:20.1]`
+
+- `[item:361]` **lecture** — と is "to". Two strokes: a short tick, then a long line that comes down and sweeps up to the right. The tick touches the long stroke about a third of the way down.
+- `[item:362]` **trace** — と (to), 2 strokes
+
+**Set 2** &nbsp; `[set:20.2]`
+
+- `[item:363]` **trace** — と (to), 2 strokes
+- `[item:364]` **trace** — と (to), 2 strokes
+- `[item:365]` **trace** — と (to), 2 strokes
+- `[item:366]` **trace** — と (to), 2 strokes
+- `[item:367]` **trace** — と (to), 2 strokes
+- `[item:368]` **trace** — と (to), 2 strokes
 
 #### Unit — Katakana &nbsp; `[unit:3]`
 _The second alphabet, used for foreign words and emphasis._
@@ -300,8 +481,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **20**
-- Items: **81**
+- Sets: **40**
+- Items: **161**
 
 ## Set types
 
