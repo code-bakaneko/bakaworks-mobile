@@ -252,6 +252,7 @@ export default function LessonPlayer(props: {
                             strokes={content.strokes}
                             viewBox={content.viewBox}
                             guides={content.guides}
+                            audio={content.audio}
                             onComplete={() => setTraced(true)} />
                     </div>
                 )}

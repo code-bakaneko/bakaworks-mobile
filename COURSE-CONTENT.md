@@ -34,7 +34,7 @@ _The first alphabet. 46 characters that spell every sound in Japanese._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
-| 1 | A Row | 3 | 13 | 84,168 |
+| 1 | A Row | 2 | 9 | 84,168 |
 | 2 | Ka Row | 3 | 17 | 74,140 |
 | 3 | Sa Row | 3 | 16 | 50,150 |
 | 4 | Ta Row | 3 | 16 | 38,120 |
@@ -50,8 +50,9 @@ _a i u e o_
 
 **Set 1** &nbsp; `[set:1.1]`
 
-- `[item:8]` **lecture** — Japanese is written with three scripts at once. Hiragana is the rounded, flowing one, and it can spell every sound in the language. Katakana handles foreign words. Kanji are borrowed Chinese characters that carry meaning. You start with hiragana, because everything else is built on top of it.
-- `[item:9]` **lecture** — The first five hiragana are the vowels: あ (a), い (i), う (u), え (e), お (o). Every other hiragana character is one of these vowels with a consonant attached. Learn these five and you already know the ending of all 46.
+- `[item:8]` **lecture** — Japanese is written with three systems at once. ひらがな and カタカナ are together called kana — each character is simply one sound, nothing more. 漢字 are characters borrowed from Chinese, and those carry meaning rather than sound. Hiragana is where everyone begins, because every Japanese word can be written in it.
+- `[item:9]` **lecture** — The first character is あ. It is one sound — "ah", like the a in father, never the a in cake. It never changes: あ is あ in every word it appears in. Three strokes, always in the same order — the short horizontal, the vertical crossing it, then the loop.
+- `[item:216]` **trace** — あ (a), 3 strokes
 
 **Set 2** &nbsp; `[set:1.2]`
 
@@ -61,14 +62,6 @@ _a i u e o_
 - `[item:213]` **trace** — あ (a), 3 strokes
 - `[item:214]` **trace** — あ (a), 3 strokes
 - `[item:215]` **trace** — あ (a), 3 strokes
-
-**Set 3** &nbsp; `[set:1.3]`
-
-- `[item:77]` **listen** — plays `あ` → **あ** / い / う / え
-- `[item:78]` **listen** — plays `い` → お / **い** / う / あ
-- `[item:79]` **listen** — plays `う` → え / あ / **う** / お
-- `[item:80]` **listen** — plays `え` → **え** / い / お / あ
-- `[item:81]` **listen** — plays `お` → う / あ / **お** / い
 
 ##### Ka Row &nbsp; `[lesson:2]`
 _ka ki ku ke ko_
@@ -376,8 +369,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **27**
-- Items: **136**
+- Sets: **26**
+- Items: **132**
 
 ## Set types
 

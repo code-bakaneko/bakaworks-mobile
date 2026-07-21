@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from "react";
+import AudioButton from "./AudioButton";
 
 /** How far off the guide a finger may stray, in viewBox units. Generous on
  *  purpose — this teaches stroke ORDER and DIRECTION, not penmanship. */
@@ -20,12 +21,15 @@ export default function KanaTracer({
     strokes,
     viewBox = "0 0 109 109",
     guides,
+    audio,
     onComplete,
 }: {
     character: string;
     romaji?: string;
     strokes: string[];
     viewBox?: string;
+    /** Overrides what is spoken. Defaults to the character itself. */
+    audio?: string;
     /** How many strokes still show their guide, counting from the first.
      *  Lower it across repetitions to strip the scaffolding away. Defaults to
      *  all of them. */
@@ -132,16 +136,20 @@ export default function KanaTracer({
     return (
         <div className="flex flex-col items-center gap-4">
 
-            {/* With no guides on the canvas, the character has to be named
-                somewhere or there is nothing to draw from. */}
-            {fromMemory && (
-                <div className="flex flex-col items-center gap-1">
-                    <span className="text-6xl font-bold leading-none">{character}</span>
-                    <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
-                        From memory
-                    </span>
-                </div>
-            )}
+            {/* Hearing the sound while drawing binds the shape to the sound
+                rather than to its romaji spelling. Plays on load, and stays
+                tappable since autoplay can be blocked. */}
+            <div className="flex items-center gap-4">
+                <AudioButton text={audio ?? character} autoPlay />
+                {fromMemory && (
+                    <div className="flex flex-col">
+                        <span className="text-5xl font-bold leading-none">{character}</span>
+                        <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold mt-1">
+                            From memory
+                        </span>
+                    </div>
+                )}
+            </div>
 
             <div className="flex items-center gap-3 text-sm">
                 <span className="text-muted">
