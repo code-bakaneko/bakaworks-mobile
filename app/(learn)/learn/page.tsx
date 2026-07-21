@@ -5,15 +5,15 @@ import { createClient } from "@/app/lib/supabase/server"
  * distances and staggered delays so it reads as a firework rather than a
  * pulsing ring.
  */
-const SPARKS = Array.from({ length: 10 }, (_, i) => {
-    const angle = (i / 10) * Math.PI * 2;
-    const distance = 3.5 + (i % 3) * 1.4;
+const SPARKS = Array.from({ length: 14 }, (_, i) => {
+    const angle = (i / 14) * Math.PI * 2;
+    const distance = 3.5 + (i % 4) * 1.3;
 
     return {
         dx: +(Math.cos(angle) * distance).toFixed(2),
         dy: +(Math.sin(angle) * distance).toFixed(2),
-        r: i % 3 === 0 ? 0.6 : 0.42,
-        delay: +((i % 5) * 0.16).toFixed(2),
+        r: i % 3 === 0 ? 0.26 : 0.17,
+        delay: +((i % 5) * 0.05).toFixed(2),
     };
 });
 
@@ -176,7 +176,7 @@ export default async function LearnPage() {
                                                         animationDelay: `${spark.delay}s`,
                                                     } as React.CSSProperties} />
                                             ))}
-                                            <circle r="1.1" className="spark-core fill-white" />
+                                            <circle r="0.7" className="spark-core fill-white" />
                                         </g>
                                     )}
                                 </g>

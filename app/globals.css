@@ -110,7 +110,7 @@
    every angle. translate is origin-independent, which avoids fighting the
    SVG transform attribute on the parent group. */
 .spark-particle {
-  animation: burst 1.6s ease-out infinite;
+  animation: burst 0.5s ease-out infinite;
 }
 
 @keyframes burst {
@@ -122,15 +122,15 @@
 
 /* The bright centre it all launches from. */
 .spark-core {
-  animation: spark-throb 1.6s ease-in-out infinite;
+  animation: spark-throb 0.5s ease-in-out infinite;
   filter:
     drop-shadow(0 0 1.5px #ffffff)
     drop-shadow(0 0 4px var(--brand));
 }
 
 @keyframes spark-throb {
-  0%, 100% { r: 1.3px; }
-  50%      { r: 0.9px; }
+  0%, 100% { r: 0.85px; }
+  50%      { r: 0.55px; }
 }
 
 .lesson-enter {
