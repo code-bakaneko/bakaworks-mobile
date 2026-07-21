@@ -37,6 +37,8 @@ export default function LessonPlayer(props: {
     setTotal: number;
     isReplay: boolean;
     sets: LessonSet[];
+    /** Admin preview: play the set without recording it or paying gold. */
+    preview?: boolean;
 }) {
     // Freeze what this session is playing. Completing a set fires a server
     // action, and a server action refreshes the current route — which hands
@@ -44,7 +46,7 @@ export default function LessonPlayer(props: {
     // of the old one. That instantly looked "finished" and auto-completed
     // every remaining set. Capturing on mount makes later props inert.
     const [session] = useState(() => props);
-    const { lessonId, lessonName, setNumber, setPosition, setTotal, isReplay, sets } = session;
+    const { lessonId, lessonName, setNumber, setPosition, setTotal, isReplay, sets, preview } = session;
 
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
@@ -72,7 +74,9 @@ export default function LessonPlayer(props: {
     // Record this set once the player reaches the end. The lesson only counts
     // as complete — and the next star only unlocks — when every set is done.
     useEffect(() => {
-        if (!finished) return;
+        // Preview plays the set without touching progress or paying out, so an
+        // admin can read through content without corrupting their own account.
+        if (!finished || preview) return;
 
         let cancelled = false;
         completeSet(lessonId, setNumber).then((result) => {
@@ -80,7 +84,7 @@ export default function LessonPlayer(props: {
         });
 
         return () => { cancelled = true };
-    }, [finished, lessonId, setNumber]);
+    }, [finished, preview, lessonId, setNumber]);
 
     function advance() {
         if (isQuestion && !checked) {
@@ -108,14 +112,18 @@ export default function LessonPlayer(props: {
         return (
             <div className="starfield lesson-enter min-h-screen
                 flex flex-col items-center justify-center gap-6 text-center px-6">
-                <span className="text-6xl">{lastSet ? "🌟" : "✨"}</span>
+                <span className="text-6xl">{preview ? "👁️" : lastSet ? "🌟" : "✨"}</span>
                 <h2 className="text-3xl font-extrabold">
-                    {lastSet ? "Lesson Complete" : `Set ${setPosition} Complete`}
+                    {preview
+                        ? `Set ${setPosition} Preview Complete`
+                        : lastSet ? "Lesson Complete" : `Set ${setPosition} Complete`}
                 </h2>
                 <p className="text-muted">
-                    {lastSet
-                        ? `${lessonName} — all ${setTotal} sets finished.`
-                        : `${setTotal - setPosition} more ${setTotal - setPosition === 1 ? "set" : "sets"} in ${lessonName}. Come back in to keep going.`}
+                    {preview
+                        ? `${lessonName} — nothing was recorded and no gold was paid.`
+                        : lastSet
+                            ? `${lessonName} — all ${setTotal} sets finished.`
+                            : `${setTotal - setPosition} more ${setTotal - setPosition === 1 ? "set" : "sets"} in ${lessonName}. Come back in to keep going.`}
                 </p>
                 {questionCount > 0 && (
                     <p className="text-muted">
@@ -143,11 +151,11 @@ export default function LessonPlayer(props: {
                         </>
                     )}
                 </div>
-                <Link href="/learn"
+                <Link href={preview ? "/admin/preview" : "/learn"}
                     className="bg-brand px-8 h-12 flex items-center rounded-sm font-extrabold
                         border-b-4 border-brand-dark
                         hover:border-b-0 hover:translate-y-1 transition-all">
-                    Back to the map
+                    {preview ? "Back to preview" : "Back to the map"}
                 </Link>
             </div>
         )
@@ -156,8 +164,16 @@ export default function LessonPlayer(props: {
     return (
         <div className="starfield lesson-enter flex flex-col min-h-screen">
 
+            {preview && (
+                <div className="bg-amber-500/15 border-b border-amber-500/40 px-6 py-2 text-center">
+                    <span className="text-sm font-bold text-amber-300">
+                        Preview — {lessonName}, set {setPosition}. Nothing is recorded.
+                    </span>
+                </div>
+            )}
+
             <header className="flex items-center gap-4 px-6 py-4 max-w-2xl w-full mx-auto">
-                <Link href="/learn"
+                <Link href={preview ? "/admin/preview" : "/learn"}
                     className="text-muted hover:text-white transition-colors text-2xl leading-none">
                     ✕
                 </Link>

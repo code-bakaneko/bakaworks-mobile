@@ -28,6 +28,11 @@ export default function LearnSidebar({ isAdmin = false }: { isAdmin?: boolean })
                     <span className="px-3 text-[10px] uppercase tracking-[0.2em] text-muted font-bold">
                         Admin
                     </span>
+                    <Link href="/admin/preview"
+                        className="px-3 py-2 rounded-sm transition-all text-muted
+                            hover:text-white hover:bg-brand/30">
+                        Content Preview
+                    </Link>
                     <Link href="/admin/vocabulary"
                         className="px-3 py-2 rounded-sm transition-all text-muted
                             hover:text-white hover:bg-brand/30">

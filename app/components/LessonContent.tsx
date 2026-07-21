@@ -1,7 +1,18 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/app/lib/supabase/server";
+import { getCourseProgress, getCourseIdForLesson } from "@/app/lib/progress";
 import LessonPlayer from "./LessonPlayer";
 
-export default async function LessonContent({ lessonId }: { lessonId: string }) {
+export default async function LessonContent({
+    lessonId,
+    forceSet,
+    preview = false,
+}: {
+    lessonId: string;
+    /** Admin preview only: play this set rather than the next unfinished one. */
+    forceSet?: number;
+    preview?: boolean;
+}) {
     const supabase = await createClient();
     const id = Number(lessonId);
 
@@ -31,6 +42,17 @@ export default async function LessonContent({ lessonId }: { lessonId: string }) 
         );
     }
 
+    // The lock is enforced HERE, not on the star map. Hiding a star only stops
+    // it being clicked — the route is still reachable by typing the URL.
+    // Preview skips it, and only /admin can reach preview at all.
+    if (!preview) {
+        const courseId = await getCourseIdForLesson(id);
+        if (courseId !== null) {
+            const { unlocked } = await getCourseProgress(courseId);
+            if (!unlocked.get(id)) redirect("/learn");
+        }
+    }
+
     // Every set this lesson has, in order.
     const setNumbers = [...new Set(lesson.lesson_sets.map((s) => s.set_number))].sort((a, b) => a - b);
 
@@ -43,7 +65,11 @@ export default async function LessonContent({ lessonId }: { lessonId: string }) 
 
     // Play the first unfinished set. Once every set is done, re-entering the
     // lesson replays the first one as practice.
-    const activeSet = setNumbers.find((n) => !done.has(n)) ?? setNumbers[0];
+    const activeSet =
+        forceSet !== undefined && setNumbers.includes(forceSet)
+            ? forceSet
+            : setNumbers.find((n) => !done.has(n)) ?? setNumbers[0];
+
     const items = lesson.lesson_sets.filter((s) => s.set_number === activeSet);
 
     return (
@@ -55,6 +81,7 @@ export default async function LessonContent({ lessonId }: { lessonId: string }) 
             setTotal={setNumbers.length}
             isReplay={done.has(activeSet)}
             sets={items}
+            preview={preview}
         />
     );
 }
