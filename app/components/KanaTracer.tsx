@@ -19,12 +19,17 @@ export default function KanaTracer({
     romaji,
     strokes,
     viewBox = "0 0 109 109",
+    guides,
     onComplete,
 }: {
     character: string;
     romaji?: string;
     strokes: string[];
     viewBox?: string;
+    /** How many strokes still show their guide, counting from the first.
+     *  Lower it across repetitions to strip the scaffolding away. Defaults to
+     *  all of them. */
+    guides?: number;
     onComplete?: () => void;
 }) {
     const svgRef = useRef<SVGSVGElement>(null);
@@ -35,6 +40,10 @@ export default function KanaTracer({
     const [wrong, setWrong] = useState(false);
 
     const done = strokeIndex >= strokes.length;
+
+    const guideCount = guides ?? strokes.length;
+    const showGuide = strokeIndex < guideCount;
+    const fromMemory = guideCount === 0;
 
     /** Pointer position in viewBox units, not screen pixels. */
     function toSvgPoint(event: React.PointerEvent): Point | null {
@@ -123,11 +132,27 @@ export default function KanaTracer({
     return (
         <div className="flex flex-col items-center gap-4">
 
+            {/* With no guides on the canvas, the character has to be named
+                somewhere or there is nothing to draw from. */}
+            {fromMemory && (
+                <div className="flex flex-col items-center gap-1">
+                    <span className="text-6xl font-bold leading-none">{character}</span>
+                    <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
+                        From memory
+                    </span>
+                </div>
+            )}
+
             <div className="flex items-center gap-3 text-sm">
                 <span className="text-muted">
                     {done ? "Complete" : `Stroke ${strokeIndex + 1} of ${strokes.length}`}
                 </span>
                 {romaji && <span className="text-brand font-bold">{romaji}</span>}
+                {!fromMemory && guideCount < strokes.length && (
+                    <span className="text-muted">
+                        · {guideCount} guide{guideCount === 1 ? "" : "s"}
+                    </span>
+                )}
             </div>
 
             <svg
@@ -147,8 +172,8 @@ export default function KanaTracer({
                 <line x1="0" y1="54.5" x2="109" y2="54.5" strokeWidth="0.5"
                     strokeDasharray="3 3" className="stroke-white/10" />
 
-                {/* The whole character, ghosted, so the goal is always visible. */}
-                {strokes.map((d, i) => (
+                {/* Ghosted guides, only as many as this repetition allows. */}
+                {strokes.slice(0, guideCount).map((d, i) => (
                     <path key={`ghost-${i}`} d={d} fill="none" strokeWidth="6"
                         strokeLinecap="round" strokeLinejoin="round"
                         className="stroke-white/10" />
@@ -161,15 +186,19 @@ export default function KanaTracer({
                         className="stroke-brand" />
                 ))}
 
-                {/* The stroke being asked for. Also the measuring path. */}
+                {/* The stroke being asked for, and the path every drawing is
+                    measured against. It must stay in the DOM even when hidden —
+                    getPointAtLength needs the geometry — so it is made
+                    invisible with stroke-opacity rather than removed. */}
                 {!done && (
                     <path ref={guideRef} d={strokes[strokeIndex]} fill="none" strokeWidth="6"
                         strokeLinecap="round" strokeLinejoin="round"
+                        strokeOpacity={showGuide ? undefined : 0}
                         className="stroke-brand/40" />
                 )}
 
-                {/* Where to begin this stroke. */}
-                {!done && guideRef.current && (
+                {/* Where to begin this stroke — hidden along with its guide. */}
+                {!done && showGuide && guideRef.current && (
                     <circle
                         r="4"
                         cx={guideRef.current.getPointAtLength(0).x}
@@ -188,7 +217,9 @@ export default function KanaTracer({
             <div className="h-6 flex items-center">
                 {wrong && (
                     <span className="text-red-400 text-sm font-bold">
-                        Follow the highlighted stroke from the dot.
+                        {showGuide
+                            ? "Follow the highlighted stroke from the dot."
+                            : "Not quite — mind the stroke order."}
                     </span>
                 )}
                 {done && (

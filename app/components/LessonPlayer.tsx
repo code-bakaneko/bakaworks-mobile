@@ -25,6 +25,7 @@ type SetContent = {
     romaji?: string;
     strokes?: string[];
     viewBox?: string;
+    guides?: number;
 };
 
 export default function LessonPlayer(props: {
@@ -250,6 +251,7 @@ export default function LessonPlayer(props: {
                             romaji={content.romaji}
                             strokes={content.strokes}
                             viewBox={content.viewBox}
+                            guides={content.guides}
                             onComplete={() => setTraced(true)} />
                     </div>
                 )}

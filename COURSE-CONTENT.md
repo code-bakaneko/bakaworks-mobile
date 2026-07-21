@@ -34,7 +34,7 @@ _The first alphabet. 46 characters that spell every sound in Japanese._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
-| 1 | A Row | 3 | 8 | 84,168 |
+| 1 | A Row | 3 | 13 | 84,168 |
 | 2 | Ka Row | 3 | 17 | 74,140 |
 | 3 | Sa Row | 3 | 16 | 50,150 |
 | 4 | Ta Row | 3 | 16 | 38,120 |
@@ -55,7 +55,12 @@ _a i u e o_
 
 **Set 2** &nbsp; `[set:1.2]`
 
-- `[item:65]` **trace** — あ (a), 3 strokes
+- `[item:210]` **trace** — あ (a), 3 strokes
+- `[item:211]` **trace** — あ (a), 3 strokes
+- `[item:212]` **trace** — あ (a), 3 strokes
+- `[item:213]` **trace** — あ (a), 3 strokes
+- `[item:214]` **trace** — あ (a), 3 strokes
+- `[item:215]` **trace** — あ (a), 3 strokes
 
 **Set 3** &nbsp; `[set:1.3]`
 
@@ -372,7 +377,7 @@ _No units yet._
 ## Totals
 
 - Sets: **27**
-- Items: **131**
+- Items: **136**
 
 ## Set types
 
