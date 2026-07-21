@@ -42,26 +42,27 @@ const CREDITS: Credit[] = [
             "data is shared under the same terms.",
     },
     {
-        what: "Voice",
+        what: "Voice — the characters",
+        title: "VOICEVOX:東北イタコ",
+        holder: "東北イタコ",
+        licence: "Free for commercial and non-commercial use, with credit",
+        href: "https://voicevox.hiroshiba.jp/",
+        obligation:
+            "Every single character you hear — every kana, in every drill and every " +
+            "trace — is spoken by 東北イタコ through VOICEVOX. Her credit is not " +
+            "optional: commercial use without it requires a paid licence.",
+    },
+    {
+        what: "Voice — the words",
         title: "VOICEVOX:冥鳴ひまり",
         holder: "冥鳴ひまり",
         licence: "Free for commercial and non-commercial use, with credit",
         href: "https://voicevox.hiroshiba.jp/",
         obligation:
-            "Almost every sound in the app — the characters, the words, the lecture " +
-            "readings — is spoken by 冥鳴ひまり through VOICEVOX. Her terms permit " +
-            "commercial use freely, and ask in return only that this credit is shown.",
-    },
-    {
-        what: "Voice — あ and う",
-        title: "VOICEVOX:九州そら",
-        holder: "九州そら",
-        licence: "Free for commercial and non-commercial use, with credit",
-        href: "https://voicevox.hiroshiba.jp/",
-        obligation:
-            "あ and う are spoken by 九州そら. They are pure vowels with no consonant " +
-            "to carry them, and hers are the ones you can actually hear. Her credit is " +
-            "not optional: commercial use without it requires a paid licence.",
+            "The words — ああ, いい, あい — and the Japanese read aloud inside lectures " +
+            "are spoken by 冥鳴ひまり. A character alone is a specimen and a word is " +
+            "speech; they are read differently, and no one voice was best at both. " +
+            "Her terms permit commercial use freely, asking only that this is shown.",
     },
 ];
 
@@ -124,7 +125,7 @@ export default function CreditsPage() {
                             className="text-brand hover:underline underline-offset-4">
                             VOICEVOX
                         </a>
-                        {" — VOICEVOX:冥鳴ひまり and VOICEVOX:九州そら. "}
+                        {" — VOICEVOX:東北イタコ and VOICEVOX:冥鳴ひまり. "}
                         Stroke data from{" "}
                         <a href="http://kanjivg.tagaini.net"
                             target="_blank" rel="noreferrer"

@@ -25,35 +25,31 @@ const ROOT = path.join(__dirname, "..");
 const VOICEVOX = "http://127.0.0.1:50021";
 
 /**
- * 冥鳴ひまり, normal style. Run with --list to see the alternatives.
+ * Two voices, split by a rule rather than a list of exceptions.
  *
- * Chosen by ear over seven others, and for her licence: commercial use is
- * permitted with the credit line "VOICEVOX:冥鳴ひまり" and nothing else —
- * no application, no reporting. 青山龍星 sounded better but restricts
- * commercial use to registered businesses and requires prior permission.
+ *   東北イタコ  every single character
+ *   冥鳴ひまり  everything longer — words, and the Japanese inside lectures
  *
- * CHANGING THIS MEANS RE-RUNNING EVERYTHING. The files are keyed by what is
- * said, not by who says it, so a new voice overwrites all of them at once —
- * cheap to do, but it is all or nothing.
+ * A character shown alone is a specimen; a word is speech. They are read
+ * differently and no single voice won both. ひまり's solo あ and う faded
+ * before the ear settled on them, which is what sent us looking; イタコ's
+ * carry. ひまり won ああ / いい / あい on a straight comparison.
+ *
+ * A rule beats a per-character table: every kana still to be added is
+ * covered without anyone remembering to extend anything.
+ *
+ * BOTH REQUIRE CREDIT on /credits — "VOICEVOX:東北イタコ" and
+ * "VOICEVOX:冥鳴ひまり". イタコ is 東北ずん子プロジェクト, where the credit
+ * is the whole price: without it, commercial use needs a paid contract.
+ *
+ * `VOICEVOX_SPEAKER` overrides the character voice for a one-off experiment.
  */
-const SPEAKER = Number(process.env.VOICEVOX_SPEAKER ?? 14);
+const CHARACTER_VOICE = Number(process.env.VOICEVOX_SPEAKER ?? 109);
+const WORD_VOICE = 14;
 
-/**
- * Characters a different voice says better, and only those.
- *
- * あ and う are pure vowels with no consonant to give them attack, and in
- * ひまり's voice a solo one is gone before the ear settles on it. 九州そら
- * (16) carries them. Everything else, including the words ああ / いい / あい,
- * stays with ひまり — a word has to be spoken by one person, so the override
- * is for single characters only.
- *
- * REQUIRES HER CREDIT. "VOICEVOX:九州そら" must stay visible on /credits:
- * her terms allow free commercial use only while it is shown.
- */
-const OVERRIDES = {
-    "あ": 16,
-    "う": 16,
-};
+/** Codepoints, not UTF-16 units, so a surrogate pair counts as one. */
+const voiceFor = (text) =>
+    [...text].length === 1 ? CHARACTER_VOICE : WORD_VOICE;
 
 /** Slower than conversation: these are single sounds being learned. */
 const SPEED = 0.9;
@@ -144,7 +140,7 @@ async function listVoices() {
  * what lets the speed be adjusted without re-analysing.
  */
 async function synthesize(text) {
-    const speaker = OVERRIDES[text] ?? SPEAKER;
+    const speaker = voiceFor(text);
 
     const query = await fetch(
         `${VOICEVOX}/audio_query?speaker=${speaker}&text=${encodeURIComponent(text)}`,
@@ -201,7 +197,10 @@ async function main() {
             console.error(`VOICEVOX is not answering on ${VOICEVOX}. Start it and try again.`);
             process.exit(1);
         }
-        console.log(`VOICEVOX ${await health.text()}, speaker ${SPEAKER}\n`);
+        console.log(
+            `VOICEVOX ${await health.text()} — ` +
+            `characters: speaker ${CHARACTER_VOICE}, words: speaker ${WORD_VOICE}\n`
+        );
     }
 
     const sets = await (await rest("lesson_sets?select=id,type,content&order=id")).json();
@@ -247,8 +246,8 @@ async function main() {
         const name = fileNameFor(text);
         const url = publicUrlFor(name);
 
-        const voice = OVERRIDES[text] ? ` [voice ${OVERRIDES[text]}]` : "";
-        process.stdout.write(`  ${text} -> ${name}${voice} ... `);
+        const who = voiceFor(text) === CHARACTER_VOICE ? "itako" : "himari";
+        process.stdout.write(`  ${text} -> ${name} [${who}] ... `);
         await upload(name, await synthesize(text));
         made++;
 
