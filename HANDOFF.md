@@ -1,4 +1,4 @@
-# Handoff — 2026-07-21
+# Handoff — 2026-07-21 (mid-restructure)
 
 ## How I work with Claude (read this first)
 
@@ -16,6 +16,68 @@
 
 A Duolingo-style Japanese learning app. Next.js 16 (App Router) + Supabase + Tailwind v4.
 Branch: `dev`. Repo: `code-bakaneko/bakaworks-mobile`.
+
+## RESTRUCTURE IN PROGRESS — read before authoring anything
+
+The course is being rebuilt around a new learning model. The old "one kana per
+lesson, fixed sets" content has been **CLEARED** — `lesson_sets` emptied (167→0)
+and `set_completions` cleared (3→0). The schools/subjects/courses scaffold, the
+3 units, and all **20 lesson "stars" (their cat-constellation `x,y`) were kept
+on purpose** — the map renders empty stars until content is re-authored. Much of
+the detail below this section still describes the OLD structure; treat it as
+reference for how the machinery works, not as the current content.
+
+### The model we're building toward
+
+- **Goal is native**, defined as *production + automaticity* — not a JLPT
+  number. JLPT tops out below native; a vocabulary counter alone breeds a
+  dictionary that can't talk. Reward *using* words, not just unlocking them.
+- **Two phases.** Phase 1 = foundation: all kana in small, fast lessons, with
+  words seeded in as their kana unlock ("learn ぬ → here's いぬ"). Phase 2 = the
+  engine: one new headline word per lesson, woven with already-known words into
+  phrases, old content refreshed by review.
+- **Two tracks, different speeds.** *Writing* (kana: systematic grid order,
+  gated — you can only write what you've learned) and *speaking/words*
+  (baby/frequency order, decoupled — you hear and say a word before you can write
+  it). A word can live on the word track before it's writable.
+- **Mastery at two grains: per character and per word.** One table keyed on the
+  text itself; character vs word is **derived from codepoint count** (1 =
+  character, longer = word) — the same rule that names audio files and splits the
+  voices. Derive, don't store.
+- **Signals:** character mastery rises from `trace` and single-character
+  `typing`; word mastery from word `typing`. A guide-less trace counts as
+  production.
+- **Review = a mastery-debt scheduler, generated at runtime, NOT authored.**
+  Every masterable item carries a debt. A right answer pays it down a lot; a
+  wrong answer barely moves it (or pushes it up). The scheduler always serves the
+  biggest debt, so the field levels up on *mastery*, not *exposure* — easy items
+  settle and stop appearing, hard ones keep surfacing until learned. This is what
+  stops pointless repetition.
+
+### Still open — decide before authoring lesson 1
+
+- Katakana front-loaded (it's Unit 3 now) vs deferred out of the opening wall.
+- Word display: kanji+furigana vs kana vs romaji-then-wean.
+- Does a wrong answer demote the debt, or just fail to pay it down?
+- Does typing a word also credit its characters, or the word alone?
+
+### Done so far
+
+- Content cleared (above). A full raw backup of the old tree was taken but the
+  old data will not be reused.
+- **Characters page rebuilt as a mystery collection** — every kana is a slot;
+  locked ones show a dashed "？" card, and a slot reveals its character + reading
+  + progress once its lesson is finished. Reveal is gated on `getCourseProgress`
+  for now — a **one-line swap** to gate on character mastery when that exists
+  (marked in `app/(learn)/characters/page.tsx`). With content cleared, every slot
+  is a mystery: the correct empty state.
+
+### Next
+
+- Settle the open decisions, then author Phase 1 lesson 1 (the vowels) in the new
+  small-lesson shape.
+- Build the mastery substrate: the mastery table + a `recordAnswer(target,
+  correct)` server action (user's client, RLS) + the debt scheduler.
 
 ## Data model
 
@@ -43,17 +105,17 @@ adding a set recomputes who has finished rather than leaving a stale flag.
 
 ## Current content
 
-**One character per lesson.** 20 of 46 kana, in two units:
+**Empty — content was cleared for the restructure (see the section up top).** The
+20 stars remain in two hiragana units plus an empty Katakana unit; `lesson_sets`
+holds nothing, so `COURSE-CONTENT.md` currently shows 0 sets / 0 items. What
+follows describes how content *was* shaped, kept as a reference for the machinery
+(set types, guides withdrawal, the notes workflow) as we re-author.
 
-- Unit 1 "Hiragana Part 1" — あいうえお かきくけこ (lessons 1–10)
-- Unit 2 "Hiragana Part 2" — さしすせそ たちつてと (lessons 11–20)
-- Unit 3 "Katakana" — empty, hidden from the map
+The old shape, for reference: one character per lesson; **set 1** a lecture plus a
+guided trace, **set 2** six traces with guides withdrawn over the final reps,
+lesson 1 also a **set 3** with a lecture and typing.
 
-Each lesson: **set 1** a lecture plus one guided trace, **set 2** six traces with the guides
-withdrawn one stroke at a time over the final reps. Lesson 1 also has **set 3** — a lecture
-on あ / ああ and two typing exercises.
-
-`COURSE-CONTENT.md` is a readable dump of all of it. **You can leave notes in it**: write a
+`COURSE-CONTENT.md` is a readable dump of the live tree. **You can leave notes in it**: write a
 line starting with `>` under any `[item:42]` / `[set:3.2]` / `[lesson:3]` anchor, then run
 `node scripts/dump-content.js` — the file rebuilds from the database and the notes come
 back attached to the same anchors.
@@ -119,12 +181,12 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
    limits commercial use to registered businesses and requires prior permission, so he
    was ruled out before any files were made.
 
-   One credits page settles both. It does not exist yet.
-2. **Lecture audio still has no fallback.** Characters and words now play real files, but
-   lecture text is spoken run-by-run in the browser by `SpeakableText`, so there is no
-   single string to attach a recording to — a machine with no Japanese voice hears
-   nothing when tapping Japanese inside a lecture. Fixing it means changing how lectures
-   are authored or stored, not just generating more audio.
+   **Resolved** — the credits page now exists at `/credits` (linked from the
+   sidebar and the landing page), crediting KanjiVG, 東北イタコ and 冥鳴ひまり.
+2. **Lecture audio — mostly addressed.** Lecture text is spoken run-by-run by
+   `SpeakableText`, and `app/lib/audio.ts` now derives a per-run `.wav` URL from the
+   text's codepoints, so tapped Japanese inside a lecture plays a real file wherever
+   one has been generated; the browser voice remains the fallback when it hasn't.
 3. **Gold is farmable.** Finishing a set pays 5 gold every time, including replays, and
    `completeSet` fires from a `useEffect` — so refreshing the completion screen pays again.
    Needs a daily cap or a reduced repeat payout.
