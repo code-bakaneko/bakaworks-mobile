@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { speakJapanese, JAPANESE_RUN } from "@/app/lib/speak";
+import { toRomaji } from "@/app/lib/romaji";
 
 /**
  * Renders text with every run of Japanese made tappable, so a lecture that
@@ -27,23 +28,35 @@ export default function SpeakableText({ text }: { text: string }) {
 
     return (
         <>
-            {parts.map((part, i) =>
-                i % 2 === 1 ? (
+            {parts.map((part, i) => {
+                if (i % 2 === 0) return part;
+
+                const reading = toRomaji(part);
+
+                return (
                     <button
                         key={i}
                         type="button"
                         onClick={() => speak(part, i)}
-                        aria-label={`Play ${part}`}
+                        aria-label={`Play ${part}${reading ? ` (${reading})` : ""}`}
                         className={`font-bold rounded-sm px-0.5
-                            underline decoration-dotted decoration-brand underline-offset-4
                             hover:bg-brand/20 hover:cursor-pointer transition-colors
                             ${speaking === i ? "bg-brand/30 text-white" : "text-brand"}`}>
-                        {part}
+                        {/* <ruby> is what furigana is made of — the browser
+                            positions <rt> above the base text on its own. No
+                            reading means no <rt>: a wrong guess above a
+                            character someone is learning is worse than none. */}
+                        <ruby>
+                            {part}
+                            {reading && (
+                                <rt className="text-[0.5em] font-normal text-muted tracking-wide">
+                                    {reading}
+                                </rt>
+                            )}
+                        </ruby>
                     </button>
-                ) : (
-                    part
-                )
-            )}
+                );
+            })}
         </>
     );
 }
