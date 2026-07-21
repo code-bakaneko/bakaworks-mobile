@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
 import KanaTracer from "./KanaTracer";
+import KanaInput from "./KanaInput";
 import SpeakableText from "./SpeakableText";
 import { completeSet } from "@/app/lib/actions";
 
@@ -50,6 +51,7 @@ export default function LessonPlayer(props: {
     const [checked, setChecked] = useState(false);
     const [score, setScore] = useState(0);
     const [traced, setTraced] = useState(false);
+    const [typedCorrect, setTypedCorrect] = useState(false);
 
     const set = sets[index];
     const content = (set?.content ?? {}) as SetContent;
@@ -59,6 +61,7 @@ export default function LessonPlayer(props: {
     const isQuestion = set?.type === "multiple_choice" || set?.type === "listen";
     const isListen = set?.type === "listen";
     const isTrace = set?.type === "trace";
+    const isTyping = set?.type === "typing";
     const isCorrect = checked && selected === content.answer;
     const finished = index >= sets.length;
     // Replaying an already-finished set never "completes the lesson".
@@ -86,9 +89,16 @@ export default function LessonPlayer(props: {
             return;
         }
 
+        if (isTyping && !checked) {
+            if (typedCorrect) setScore((score) => score + 1);
+            setChecked(true);
+            return;
+        }
+
         setSelected(null);
         setChecked(false);
         setTraced(false);
+        setTypedCorrect(false);
         setIndex((index) => index + 1);
     }
 
@@ -235,6 +245,27 @@ export default function LessonPlayer(props: {
                     </div>
                 )}
 
+                {isTyping && (
+                    <div className="flex flex-col gap-8 items-center">
+                        <div className="flex flex-col gap-3 text-center">
+                            <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
+                                Write it
+                            </span>
+                            <div className="flex items-center gap-4 justify-center">
+                                {(content.audio || content.audio_url) && (
+                                    <AudioButton text={content.audio} url={content.audio_url} />
+                                )}
+                                <p className="text-2xl md:text-3xl font-bold">{content.prompt}</p>
+                            </div>
+                        </div>
+                        <KanaInput
+                            key={set.id}
+                            answer={content.answer ?? ""}
+                            checked={checked}
+                            onChange={setTypedCorrect} />
+                    </div>
+                )}
+
                 {set.type === "trace" && content.strokes && (
                     <div className="flex flex-col gap-6 items-center">
                         <div className="flex flex-col gap-2 text-center">
@@ -269,7 +300,7 @@ export default function LessonPlayer(props: {
                 <div className="max-w-2xl w-full mx-auto px-6 py-5
                     flex items-center justify-between gap-4">
 
-                    {checked ? (
+                    {checked && !isTyping ? (
                         <span className={`font-extrabold
                             ${isCorrect ? "text-green-400" : "text-red-400"}`}>
                             {isCorrect ? "Correct" : `Answer: ${content.answer}`}
@@ -278,12 +309,15 @@ export default function LessonPlayer(props: {
 
                     <button
                         onClick={advance}
-                        disabled={(isQuestion && selected === null) || (isTrace && !traced)}
+                        disabled={
+                            (isQuestion && selected === null) ||
+                            (isTrace && !traced)
+                        }
                         className="bg-brand px-10 h-12 rounded-sm font-extrabold
                             border-b-4 border-brand-dark
                             hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer
                             disabled:opacity-40 disabled:pointer-events-none disabled:translate-y-0">
-                        {isQuestion && !checked ? "Check" : "Continue"}
+                        {(isQuestion || isTyping) && !checked ? "Check" : "Continue"}
                     </button>
                 </div>
             </footer>

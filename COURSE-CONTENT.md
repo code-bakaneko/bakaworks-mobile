@@ -34,7 +34,7 @@ _Your first ten characters — the vowels and the K row._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
-| 1 | あ | 2 | 9 | 84,168 |
+| 1 | あ | 3 | 12 | 84,168 |
 | 2 | い | 2 | 8 | 74,140 |
 | 3 | う | 2 | 8 | 50,150 |
 | 4 | え | 2 | 8 | 38,120 |
@@ -62,6 +62,12 @@ _a_
 - `[item:213]` **trace** — あ (a), 3 strokes
 - `[item:214]` **trace** — あ (a), 3 strokes
 - `[item:215]` **trace** — あ (a), 3 strokes
+
+**Set 3** &nbsp; `[set:1.3]`
+
+- `[item:369]` **lecture** — あ is one of the very few characters that is a whole word on its own. あ is the sound of noticing something — "ah", "oh". Say it twice and you get ああ, which is the same reaction drawn out, and also means "like that". Almost every other Japanese word needs a consonant, so these two are rare: nothing else is written with あ alone.
+- `[item:370]` **typing** — {"audio":"あ","answer":"あ","prompt":"The sound of noticing something — \"ah\""}
+- `[item:371]` **typing** — {"audio":"ああ","answer":"ああ","prompt":"The same, drawn out — also \"like that\""}
 
 ##### い &nbsp; `[lesson:2]`
 _i_
@@ -481,8 +487,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **40**
-- Items: **161**
+- Sets: **41**
+- Items: **164**
 
 ## Set types
 

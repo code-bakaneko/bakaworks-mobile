@@ -95,6 +95,111 @@ export function toRomaji(run: string): string | null {
     return out || null;
 }
 
+// --- romaji in, kana out ----------------------------------------------------
+
+/** Every romaji spelling that maps to kana, longest matches first. */
+const TO_KANA: Record<string, string> = {
+    a: "あ", i: "い", u: "う", e: "え", o: "お",
+    ka: "か", ki: "き", ku: "く", ke: "け", ko: "こ",
+    ga: "が", gi: "ぎ", gu: "ぐ", ge: "げ", go: "ご",
+    sa: "さ", shi: "し", si: "し", su: "す", se: "せ", so: "そ",
+    za: "ざ", ji: "じ", zi: "じ", zu: "ず", ze: "ぜ", zo: "ぞ",
+    ta: "た", chi: "ち", ti: "ち", tsu: "つ", tu: "つ", te: "て", to: "と",
+    da: "だ", di: "ぢ", du: "づ", de: "で", do: "ど",
+    na: "な", ni: "に", nu: "ぬ", ne: "ね", no: "の",
+    ha: "は", hi: "ひ", fu: "ふ", hu: "ふ", he: "へ", ho: "ほ",
+    ba: "ば", bi: "び", bu: "ぶ", be: "べ", bo: "ぼ",
+    pa: "ぱ", pi: "ぴ", pu: "ぷ", pe: "ぺ", po: "ぽ",
+    ma: "ま", mi: "み", mu: "む", me: "め", mo: "も",
+    ya: "や", yu: "ゆ", yo: "よ",
+    ra: "ら", ri: "り", ru: "る", re: "れ", ro: "ろ",
+    wa: "わ", wo: "を", nn: "ん",
+    kya: "きゃ", kyu: "きゅ", kyo: "きょ",
+    gya: "ぎゃ", gyu: "ぎゅ", gyo: "ぎょ",
+    sha: "しゃ", shu: "しゅ", sho: "しょ",
+    ja: "じゃ", ju: "じゅ", jo: "じょ",
+    cha: "ちゃ", chu: "ちゅ", cho: "ちょ",
+    nya: "にゃ", nyu: "にゅ", nyo: "にょ",
+    hya: "ひゃ", hyu: "ひゅ", hyo: "ひょ",
+    bya: "びゃ", byu: "びゅ", byo: "びょ",
+    pya: "ぴゃ", pyu: "ぴゅ", pyo: "ぴょ",
+    mya: "みゃ", myu: "みゅ", myo: "みょ",
+    rya: "りゃ", ryu: "りゅ", ryo: "りょ",
+};
+
+const VOWELS = "aiueo";
+
+/**
+ * Converts romaji to kana the way an IME does, leaving any trailing
+ * incomplete sequence as latin so the field can be typed into naturally:
+ * "k" stays "k" until the vowel arrives and turns it into か.
+ */
+export function romajiToKana(input: string, final = false): string {
+    let out = "";
+    let buffer = input.toLowerCase();
+
+    while (buffer.length > 0) {
+        // A lone trailing "n" is still pending while typing — it could yet
+        // become な or にゃ. Only settle it as ん when the input is finished.
+        if (buffer === "n") {
+            return out + (final ? "ん" : "n");
+        }
+
+        // "nn" typed on its own is the explicit way to write ん.
+        if (buffer === "nn") {
+            return out + "ん";
+        }
+
+        // Doubled consonant becomes a small tsu: "kko" -> っこ.
+        if (
+            buffer.length >= 2 &&
+            buffer[0] === buffer[1] &&
+            !VOWELS.includes(buffer[0]) &&
+            buffer[0] !== "n"
+        ) {
+            out += "っ";
+            buffer = buffer.slice(1);
+            continue;
+        }
+
+        // "n" before any consonant is ん — including a second n, which is why
+        // konnichiwa gives こんにちわ: the first n closes こん and the second
+        // one starts に. Before a vowel or y it is not, since な and にゃ are
+        // still possible.
+        if (buffer[0] === "n" && buffer.length >= 2) {
+            const next = buffer[1];
+            if (next !== "y" && !VOWELS.includes(next)) {
+                out += "ん";
+                buffer = buffer.slice(1);
+                continue;
+            }
+        }
+
+        // Longest match wins, so "sha" is not read as "sa" + leftovers.
+        let matched = false;
+        for (const size of [3, 2, 1]) {
+            const piece = buffer.slice(0, size);
+            if (TO_KANA[piece]) {
+                out += TO_KANA[piece];
+                buffer = buffer.slice(size);
+                matched = true;
+                break;
+            }
+        }
+        if (matched) continue;
+
+        // Nothing matches yet. If the rest could still become kana, hold it
+        // as latin; otherwise pass the character through untouched.
+        const couldGrow = Object.keys(TO_KANA).some((k) => k.startsWith(buffer));
+        if (couldGrow) return out + buffer;
+
+        out += buffer[0];
+        buffer = buffer.slice(1);
+    }
+
+    return out;
+}
+
 export type RomajiToken = { text: string; romaji: string };
 
 /**
