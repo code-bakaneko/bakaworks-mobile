@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/app/lib/supabase/server";
+import {
+    HIRAGANA_CHART, KATAKANA_CHART, buildSections, scriptOf,
+    type KanaScript, type Groups,
+} from "@/app/lib/kana";
+import CharacterTabs from "@/app/(learn)/characters/CharacterTabs";
 
 /**
  * Every set in the course, each one playable directly.
@@ -18,9 +23,33 @@ export default async function AdminPreviewPage() {
 
     if (error) return <div className="p-10 text-muted">Could not load the course.</div>;
 
+    // The full canonical set, every slot revealed — a reference of every
+    // character the collection covers, laid out as the gojūon table.
+    const revealed = () => ({ revealed: true, pct: 0 });
+    const fullSet: Groups = {
+        hiragana: buildSections(HIRAGANA_CHART, revealed),
+        katakana: buildSections(KATAKANA_CHART, revealed),
+        kanji: [],
+    };
+
+    // Group lessons by writing system, not by unit — so the two hiragana units
+    // (kept separate for their cat constellations) read as one "Hiragana"
+    // section here, with no "Part 1 / Part 2".
+    const lessons = (units ?? []).flatMap((u) => u.lessons);
+    const byScript: Record<KanaScript, typeof lessons> = { hiragana: [], katakana: [], kanji: [] };
+    for (const lesson of lessons) {
+        const script = scriptOf(lesson.name);
+        if (script) byScript[script].push(lesson);
+    }
+    const SCRIPTS: { key: KanaScript; label: string }[] = [
+        { key: "hiragana", label: "Hiragana" },
+        { key: "katakana", label: "Katakana" },
+        { key: "kanji", label: "Kanji" },
+    ];
+
     return (
-        <div className="min-h-screen px-6 py-10">
-            <div className="max-w-3xl mx-auto flex flex-col gap-10">
+        <div className="min-h-screen px-4 py-10">
+            <div className="w-full flex flex-col gap-10">
 
                 <header className="flex flex-col gap-2">
                     <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
@@ -33,17 +62,17 @@ export default async function AdminPreviewPage() {
                     </p>
                 </header>
 
-                {units?.map((unit) => (
-                    <section key={unit.id} className="flex flex-col gap-4">
+                {SCRIPTS.map(({ key, label }) => {
+                    const group = byScript[key];
+                    if (group.length === 0) return null;
+
+                    return (
+                    <section key={key} className="flex flex-col gap-4">
                         <h2 className="text-lg font-extrabold border-b border-white/10 pb-2">
-                            {unit.name}
+                            {label}
                         </h2>
 
-                        {unit.lessons.length === 0 && (
-                            <p className="text-sm text-muted">No lessons yet.</p>
-                        )}
-
-                        {unit.lessons.map((lesson) => {
+                        {group.map((lesson) => {
                             // Group the items so each button can say what is inside.
                             const sets = new Map<number, string[]>();
                             for (const item of lesson.lesson_sets) {
@@ -90,7 +119,15 @@ export default async function AdminPreviewPage() {
                             );
                         })}
                     </section>
-                ))}
+                    );
+                })}
+
+                <section className="flex flex-col gap-4">
+                    <h2 className="text-lg font-extrabold border-b border-white/10 pb-2">
+                        Characters — full set
+                    </h2>
+                    <CharacterTabs groups={fullSet} />
+                </section>
             </div>
         </div>
     );

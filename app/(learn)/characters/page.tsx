@@ -1,85 +1,57 @@
 import { createClient } from "@/app/lib/supabase/server"
 import { getCourseProgress } from "@/app/lib/progress"
-import { toRomaji } from "@/app/lib/romaji"
+import {
+    HIRAGANA_CHART, KATAKANA_CHART, buildSections, listToSections, scriptOf,
+    type Groups, type CharState,
+} from "@/app/lib/kana"
+import CharacterTabs from "./CharacterTabs"
 
 /**
- * The kana collection. Every character the course teaches is a slot; a slot
- * stays a "？" mystery until the learner has unlocked it, then it reveals the
- * character and its reading. Seeing the locked slots is the point — the row of
- * mysteries is what there is left to collect.
+ * The kana/kanji collection, tabbed by writing system and laid out as the
+ * gojūon table (see app/lib/kana.ts). Hiragana and katakana show the FULL
+ * canonical set — the point of a collection is to see every slot there is to
+ * fill. Kanji has no fixed table, so its tab lays whatever the course teaches
+ * into rows of five.
  *
- * NOTE ON THE REVEAL SIGNAL. What flips a slot from mystery to known is, for
- * now, lesson completion via `getCourseProgress` — the same source the map and
- * the lesson route already trust, so nothing can disagree. When the mastery
- * system lands, the character's mastery becomes the gate instead; swap the
- * `revealed` computation below and nothing else changes. With content cleared,
- * no lesson can complete, so every slot is a mystery — the correct empty state.
+ * A slot reveals when its character is learned. That signal is lesson
+ * completion for now — the same source the map and lesson route trust — and
+ * swaps to character mastery in one line once that system exists. With content
+ * cleared, nothing is learned, so every slot is a mystery.
  */
 export default async function CharactersPage() {
     const supabase = await createClient();
 
-    // No inner join on lesson_sets: a star with no content yet is still a slot
-    // to show, drawn as a mystery.
     const { data: units } = await supabase
         .from("units")
-        .select("id, name, lessons(id, name)")
+        .select("id, lessons(id, name)")
         .eq("course_id", 1)
         .order("id")
         .order("id", { referencedTable: "lessons" });
 
     const { progress } = await getCourseProgress(1);
 
-    return (
-        <div className="max-w-3xl mx-auto p-4 flex flex-col gap-10">
-            {units?.map((unit) => (
-                <section key={unit.id} className="flex flex-col gap-3">
-                    <h2 className="text-xl font-extrabold">{unit.name}</h2>
+    // Learned state keyed by the character itself, so a table cell can look up
+    // its own progress. Also collect any kanji the course teaches.
+    const byChar = new Map<string, CharState>();
+    const kanji: string[] = [];
 
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2">
-                        {unit.lessons.map((lesson) => {
-                            const p = progress.get(lesson.id);
-                            // Revealed once the kana's lesson is finished. This
-                            // is the line the mastery system will replace.
-                            const revealed = !!p && p.total > 0 && p.done >= p.total;
-                            const pct = p && p.total > 0 ? (p.done / p.total) * 100 : 0;
+    for (const unit of units ?? []) {
+        for (const lesson of unit.lessons) {
+            const p = progress.get(lesson.id);
+            const revealed = !!p && p.total > 0 && p.done >= p.total;
+            const pct = p && p.total > 0 ? (p.done / p.total) * 100 : 0;
+            byChar.set(lesson.name, { revealed, pct });
+            if (scriptOf(lesson.name) === "kanji") kanji.push(lesson.name);
+        }
+    }
 
-                            if (!revealed) {
-                                return (
-                                    <div key={lesson.id}
-                                        className="bg-gray-950 min-h-40 p-3 rounded-sm
-                                            flex flex-col gap-2 items-center justify-center
-                                            border-2 border-dashed border-slate-800">
-                                        <span className="text-5xl leading-none text-slate-700 select-none">
-                                            ？
-                                        </span>
-                                        <span className="text-center text-slate-700 text-xs uppercase tracking-widest">
-                                            Locked
-                                        </span>
-                                    </div>
-                                );
-                            }
+    const state = (char: string): CharState => byChar.get(char) ?? { revealed: false, pct: 0 };
 
-                            const romaji = toRomaji(lesson.name) ?? "";
+    const groups: Groups = {
+        hiragana: buildSections(HIRAGANA_CHART, state),
+        katakana: buildSections(KATAKANA_CHART, state),
+        kanji: listToSections(kanji, state),
+    };
 
-                            return (
-                                <div key={lesson.id}
-                                    className="bg-gray-950 min-h-40 p-3 rounded-sm
-                                        flex flex-col gap-2 items-center justify-center
-                                        border-2 border-slate-800
-                                        hover:border-white hover:-translate-y-1 transition-all">
-                                    <span className="text-5xl leading-none">{lesson.name}</span>
-                                    <span className="text-center text-muted text-sm">{romaji}</span>
-
-                                    <div className="w-full h-2 bg-slate-800 rounded-xs overflow-hidden mt-1">
-                                        <div className="h-full bg-brand transition-all"
-                                            style={{ width: `${pct}%` }} />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
-            ))}
-        </div>
-    );
+    return <CharacterTabs groups={groups} />;
 }
