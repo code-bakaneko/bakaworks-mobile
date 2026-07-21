@@ -1,5 +1,4 @@
 import { createClient } from "@/app/lib/supabase/server"
-import Link from "next/link";
 
 export default async function LearnPage() {
     const supabase = await createClient();
@@ -82,10 +81,13 @@ export default async function LearnPage() {
                             );
 
                             // Locked lessons are not enterable, so no link.
+                            // Use a native SVG <a> (not next/link): an HTML anchor
+                            // nested in <svg> hydrates in the wrong namespace and
+                            // triggers a hydration mismatch.
                             return locked ? (
                                 <g key={lesson.id} className="cursor-not-allowed">{star}</g>
                             ) : (
-                                <Link key={lesson.id} href={`/lesson/${lesson.id}`}>{star}</Link>
+                                <a key={lesson.id} href={`/lesson/${lesson.id}`} className="cursor-pointer">{star}</a>
                             );
                         })}
 
