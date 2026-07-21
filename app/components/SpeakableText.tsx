@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react";
-import { speakJapanese, JAPANESE_RUN } from "@/app/lib/speak";
+import { playJapanese, JAPANESE_RUN } from "@/app/lib/speak";
 import { toRomajiTokens } from "@/app/lib/romaji";
 
 /**
@@ -17,7 +17,7 @@ export default function SpeakableText({ text }: { text: string }) {
     const [speaking, setSpeaking] = useState<number | null>(null);
 
     function speak(run: string, key: number) {
-        if (!speakJapanese(run)) return;
+        playJapanese(run);
         setSpeaking(key);
         window.setTimeout(() => setSpeaking(null), 1400);
     }

@@ -85,9 +85,26 @@ function spokenText(set) {
     return null;
 }
 
-/** ASCII filename from the codepoints, so no Japanese reaches a URL or a shell. */
+/**
+ * ASCII filename from the codepoints, so no Japanese reaches a URL or a shell.
+ *
+ * MUST MATCH `audioFileName` in app/lib/audio.ts. The browser derives this
+ * same name to play lecture audio, since a lecture has no row to hang an
+ * `audio_url` on — change one and change the other, or lectures go quiet.
+ */
 const fileNameFor = (text) =>
     [...text].map((ch) => ch.codePointAt(0).toString(16)).join("-") + ".wav";
+
+/** Hiragana, katakana and kanji. Mirrors JAPANESE_RUN in app/lib/speak.ts. */
+const JAPANESE_RUN = /[぀-ヿ一-鿿]+/g;
+
+/**
+ * Small kana and the long-vowel mark modify the sound before them and have
+ * none of their own. A lecture that mentions っ by name yields it as its own
+ * run, and asking the engine to pronounce it in isolation produces nothing
+ * worth storing.
+ */
+const MODIFIERS_ONLY = /^[ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮー]+$/;
 
 const publicUrlFor = (name) =>
     `${URL}/storage/v1/object/public/${BUCKET}/${FOLDER}/${name}`;
@@ -180,7 +197,22 @@ async function main() {
         byText.get(text).push(set);
     }
 
-    console.log(`${byText.size} distinct sound(s) across ${sets.length} set(s)\n`);
+    // Lecture text needs files too, but no row to link them to: the browser
+    // picks the Japanese out run by run and derives each URL from the run
+    // itself. So these are generated and left unlinked — an empty array.
+    for (const set of sets) {
+        if (set.type !== "lecture") continue;
+        for (const run of (set.content?.text ?? "").match(JAPANESE_RUN) ?? []) {
+            if (MODIFIERS_ONLY.test(run)) continue;
+            if (!byText.has(run)) byText.set(run, []);
+        }
+    }
+
+    const linkable = [...byText.values()].filter((using) => using.length > 0).length;
+    console.log(
+        `${byText.size} distinct sound(s) — ${linkable} linked to sets, ` +
+        `${byText.size - linkable} for lecture text\n`
+    );
 
     if (dry) {
         for (const [text, using] of byText) {

@@ -136,7 +136,13 @@ export default async function Home({
                 alt="X" className="h-10" />
             </a>
           </div>
-          <p className="text-white/30 text-sm">BakaWorks — Beta</p>
+          <div className="flex flex-col items-center gap-2">
+            <Link href="/credits"
+              className="text-sm text-muted hover:text-white transition-colors">
+              Credits
+            </Link>
+            <p className="text-white/30 text-sm">BakaWorks — Beta</p>
+          </div>
         </div>
       </footer>
 

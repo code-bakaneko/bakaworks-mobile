@@ -48,7 +48,15 @@ export default function LearnSidebar({ isAdmin = false }: { isAdmin?: boolean })
                 </div>
             )}
 
-            <form action={signOut} className={isAdmin ? "" : "mt-auto"}>
+            {/* Required attribution, so it has to be reachable from inside the
+                app and not only from the landing page. */}
+            <Link href="/credits"
+                className={`px-3 py-2 rounded-sm transition-all text-sm text-muted
+                    hover:text-white hover:bg-brand/30 ${isAdmin ? "" : "mt-auto"}`}>
+                Credits
+            </Link>
+
+            <form action={signOut}>
                 <button type="submit"
                     className="w-full text-left px-3 py-2 rounded-sm transition-all
                         text-muted hover:text-white hover:bg-red-500/20 hover:cursor-pointer">
