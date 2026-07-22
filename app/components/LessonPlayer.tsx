@@ -7,7 +7,7 @@ import AudioButton from "./AudioButton";
 import KanaTracer from "./KanaTracer";
 import KanaInput from "./KanaInput";
 import SpeakableText from "./SpeakableText";
-import { completeSet } from "@/app/lib/actions";
+import { completeSet, recordReview } from "@/app/lib/actions";
 
 type LessonSet = Tables<"lesson_sets">;
 
@@ -39,6 +39,9 @@ export default function LessonPlayer(props: {
     sets: LessonSet[];
     /** Admin preview: play the set without recording it or paying gold. */
     preview?: boolean;
+    /** A generated review drill (a repeat of a finished lesson): record through
+     *  recordReview, which credits mastery + tapered gold but writes no set. */
+    review?: boolean;
 }) {
     // Freeze what this session is playing. Completing a set fires a server
     // action, and a server action refreshes the current route — which hands
@@ -46,7 +49,7 @@ export default function LessonPlayer(props: {
     // of the old one. That instantly looked "finished" and auto-completed
     // every remaining set. Capturing on mount makes later props inert.
     const [session] = useState(() => props);
-    const { lessonId, lessonName, setNumber, setPosition, setTotal, isReplay, sets, preview } = session;
+    const { lessonId, lessonName, setNumber, setPosition, setTotal, isReplay, sets, preview, review } = session;
 
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState<string | null>(null);
@@ -99,12 +102,17 @@ export default function LessonPlayer(props: {
         if (!finished || preview) return;
 
         let cancelled = false;
-        completeSet(lessonId, setNumber, resultsRef.current).then((result) => {
+        // A review drill is not an authored set, so it records through
+        // recordReview (mastery + tapered gold, no set_completions row).
+        const record = review
+            ? recordReview(lessonId, resultsRef.current)
+            : completeSet(lessonId, setNumber, resultsRef.current);
+        record.then((result) => {
             if (!cancelled && result) setReward(result);
         });
 
         return () => { cancelled = true };
-    }, [finished, preview, lessonId, setNumber]);
+    }, [finished, preview, review, lessonId, setNumber]);
 
     // Enter works the Check / Continue button, so a lesson plays from the
     // keyboard: submit an answer, then move on. It obeys the same gate as the
@@ -157,18 +165,21 @@ export default function LessonPlayer(props: {
         return (
             <div className="starfield lesson-enter min-h-screen
                 flex flex-col items-center justify-center gap-6 text-center px-6">
-                <span className="text-6xl">{preview ? "👁️" : lastSet ? "🌟" : "✨"}</span>
+                <span className="text-6xl">{preview ? "👁️" : review ? "🔁" : lastSet ? "🌟" : "✨"}</span>
                 <h2 className="text-3xl font-extrabold">
                     {preview
                         ? `Set ${setPosition} Preview Complete`
+                        : review ? "Review Complete"
                         : lastSet ? "Lesson Complete" : `Set ${setPosition} Complete`}
                 </h2>
                 <p className="text-muted">
                     {preview
                         ? `${lessonName} — nothing was recorded and no gold was paid.`
-                        : lastSet
-                            ? `${lessonName} — all ${setTotal} sets finished.`
-                            : `${setTotal - setPosition} more ${setTotal - setPosition === 1 ? "set" : "sets"} in ${lessonName}. Come back in to keep going.`}
+                        : review
+                            ? `${lessonName} — reviewed. Come back any time to keep it sharp.`
+                            : lastSet
+                                ? `${lessonName} — all ${setTotal} sets finished.`
+                                : `${setTotal - setPosition} more ${setTotal - setPosition === 1 ? "set" : "sets"} in ${lessonName}. Come back in to keep going.`}
                 </p>
                 {questionCount > 0 && (
                     <p className="text-muted">

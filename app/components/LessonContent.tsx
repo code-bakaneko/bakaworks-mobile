@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/app/lib/supabase/server";
 import { getCourseProgress, getCourseIdForLesson } from "@/app/lib/progress";
+import { buildReviewDrill } from "@/app/lib/review";
 import LessonPlayer from "./LessonPlayer";
 
 export default async function LessonContent({
@@ -64,10 +65,30 @@ export default async function LessonContent({
         .order("completed_at");
     const done = new Set(completions?.map((c) => c.set_number));
 
-    // Once the whole lesson is finished, entering it again cycles: the set
-    // played longest ago comes up next, and finishing it sends it to the back
-    // of the queue. completed_at is re-stamped on every play, so the order
-    // rotates on its own with nothing extra to store.
+    // A fully-finished lesson, re-entered, becomes a runtime spaced-repetition
+    // drill (app/lib/review.ts): its own kana mixed with the weakest, stalest
+    // kana the learner knows, typed not traced. Admin preview and an explicit
+    // forceSet still play the authored content.
+    const allDone = setNumbers.every((n) => done.has(n));
+    if (allDone && !preview && forceSet === undefined) {
+        const reviewItems = await buildReviewDrill(id);
+        return (
+            <LessonPlayer
+                lessonId={lesson.id}
+                lessonName={lesson.name}
+                setNumber={0}
+                setPosition={1}
+                setTotal={1}
+                isReplay
+                review
+                sets={reviewItems}
+            />
+        );
+    }
+
+    // Before the lesson is finished, entering it plays the first unfinished set.
+    // (The stalest-set cycle below only matters if the review branch is skipped,
+    // e.g. admin preview of a completed lesson.)
     const stalest = completions
         ?.map((c) => c.set_number)
         .find((n) => setNumbers.includes(n));
