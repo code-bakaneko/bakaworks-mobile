@@ -88,6 +88,11 @@ sets). The `!inner` joins in `learn/page.tsx` and `progress.ts` hide empty units
   rows from `character_mastery`. Crediting already works (word-alone) through the
   existing pipeline; only the display is missing. Build it when word items are
   first authored.
+- **Teach the typing tricks in the lecture, not as always-on tips.** The `-`→ー,
+  small-つ (double consonant), and small-kana rules are all native IME behavior and
+  work now, but the tip row under `KanaInput` is a stopgap — nobody is taught these
+  cold. When katakana's long vowel arrives, teach ー in that lesson's lecture; teach
+  the small つ when the first word needs it; then trim the tip row accordingly.
 
 ### Done so far
 
@@ -99,10 +104,20 @@ sets). The `!inner` joins in `learn/page.tsx` and `progress.ts` hide empty units
   unlocked *before* the set (so a kana's own set only unlocks; later reviews build
   mastery); anti-cram daily diminishing returns via `set_daily_reps`. Knobs in
   `app/lib/mastery.ts`.
-- **Base hiragana authored — lessons 1–10, Unit 1.** Each lesson = one gojūon row in the
-  "review one back" shape: Set 1 lecture + trace + type of kana₁; each later set introduces
-  the next kana (trace, type) and reviews only the one before it. 5-kana row = 5 sets / 19
-  items; the short や and わ rows = 3 sets / 11.
+- **Base hiragana authored — lessons 1–10, Unit 1.** Each lesson = one gojūon row in a
+  deliberately lean **2-set** shape: **Set 1** = lecture, trace every kana once, then type
+  every kana; **Set 2** = type the whole row again. 5-kana row = 16 items, the short や/わ
+  rows = 10. Tracing is minimized on purpose — a mouse is clumsy — so a kana is written once
+  and drilled by typing thereafter.
+- **Dynamic review engine (the debt scheduler) — built.** Re-entering a *finished* lesson no
+  longer replays authored sets; `buildReviewDrill` (`app/lib/review.ts`) generates a typing
+  drill at runtime: the lesson's own kana plus the weakest/stalest kana the learner knows,
+  interleaved, capped at 2× the lesson's kana count, shrinking when little is due.
+  **Debt = (cap − xp) × (1 + days since last practised)** — spaced repetition, so a
+  strong-but-stale kana can out-rank a weak-but-fresh one; a maxed, recent kana scores 0 and
+  never appears. Recorded by `recordReview` (`actions.ts`) — mastery XP **and gold, both
+  tapered** by the same-day multiplier, with no `set_completions` row. It refuses to pay
+  unless the lesson is genuinely complete (the lesson id comes from the browser).
 - **Authoring tooling** now lives in the repo (was scratchpad-only). See below.
 - **Typing input got IME tricks + tips.** `romajiToKana` (our own converter, no OS IME, no
   CDN) now also does `-`→ー, doubled consonant→small つ, and `x`-prefix→small kana; every
@@ -112,8 +127,11 @@ sets). The `!inner` joins in `learn/page.tsx` and `progress.ts` hide empty units
 
 - **Author Unit 2 (Words)** — the Phase 2 engine: one headline word per lesson, seeded as
   its kana are known. Needs a word-mastery display surface (see "Build later").
-- **Build the debt scheduler** — mastery XP exists, but review is still hand-authored
-  (one-back), not the runtime debt scheduler the model calls for.
+- **A separate kana/kanji tracing menu.** Tracing is now first-pass only inside lessons; the
+  decision is that writing practice lives in its own practice area, reachable any time.
+  Not built yet.
+- **Tune the review knobs** once it has been used: the debt formula, the 2× cap, and the
+  gold taper all sit in one place each (`review.ts`, `actions.ts`, `mastery.ts`).
 
 ## Data model
 
@@ -142,8 +160,8 @@ adding a set recomputes who has finished rather than leaving a stale flag.
 ## Current content
 
 **Unit 1 (Hiragana) is fully authored — lessons 1–10, the whole base gojūon.** Each is one
-chart row in the "review one back" shape (see "Done so far"). Units 2 (Words) and 3
-(Katakana) exist but are empty. Run `node scripts/dump-content.js` to see the live tree in
+chart row in the 2-set shape (see "Done so far"); repeats are generated, not authored.
+Units 2 (Words) and 3 (Katakana) exist but are empty. Run `node scripts/dump-content.js` to see the live tree in
 `COURSE-CONTENT.md`.
 
 `COURSE-CONTENT.md` is a readable dump of the live tree. **You can leave notes in it**: write a
@@ -219,9 +237,11 @@ cat; a fancier cat / kana-symbol redraw is deferred polish.
    `SpeakableText`, and `app/lib/audio.ts` now derives a per-run `.wav` URL from the
    text's codepoints, so tapped Japanese inside a lecture plays a real file wherever
    one has been generated; the browser voice remains the fallback when it hasn't.
-3. **Gold is farmable.** Finishing a set pays 5 gold every time, including replays, and
-   `completeSet` fires from a `useEffect` — so refreshing the completion screen pays again.
-   Needs a daily cap or a reduced repeat payout.
+3. **Gold farming — mostly closed.** Authored sets can no longer be replayed: each set is
+   completed once, and re-entering a finished lesson serves a generated review whose gold is
+   tapered by the same-day multiplier (`recordReview`). What remains is that `completeSet`
+   still fires from a `useEffect`, so refreshing a *first* completion screen could re-pay
+   that set's flat 5.
 4. **Courses are hardcoded.** `/learn` queries `course_id = 1`. The enrollment page links to
    `/learn?course=N` and nothing reads the param. There is no enrollments table, so a chosen
    course is not remembered.
@@ -267,7 +287,7 @@ Two committed scripts make adding kana lessons repeatable — no more ad-hoc cur
   (`{ "た": { strokes, viewBox } }`). `node scripts/fetch-strokes.js` does the built-in
   default list; pass kana as args to fetch specific ones. Merges, so it's re-runnable.
 - **`scripts/author-lesson.js`** — the `LESSONS` config maps each lesson to `{ id, unitId,
-  name, lecture, kana: [[char, romaji], …] }`. It builds the "review one back" sets, reads
+  name, lecture, kana: [[char, romaji], …] }`. It builds the 2-set lesson shape, reads
   `strokes.json`, and writes rows matching lessons 1–3 exactly (trace `{guides, romaji,
   strokes, viewBox, character}`, typing `{audio, answer, prompt}`, lecture `{text}`; `sort`
   is 1-based within a set). It also renames the unit/lesson and derives the lesson blurb
