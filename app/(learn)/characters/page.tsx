@@ -1,4 +1,5 @@
 import { getCharacterProgress } from "@/app/lib/progress"
+import { masteryPct } from "@/app/lib/mastery"
 import {
     HIRAGANA_CHART, KATAKANA_CHART, buildSections, listToSections, scriptOf,
     type Groups, type CharState,
@@ -16,14 +17,13 @@ import CharacterTabs from "./CharacterTabs"
  * `getCharacterProgress`. With no content finished, every slot is a mystery.
  */
 export default async function CharactersPage() {
-    const { taught, unlocked } = await getCharacterProgress(1);
+    const { taught, unlocked, mastery } = await getCharacterProgress(1);
 
-    // Revealed when unlocked; the bar is MASTERY, not unlock. It starts empty
-    // and the mastery system will fill it — for now every unlocked card shows a
-    // bar with nothing in it yet.
+    // Revealed when unlocked; the bar is MASTERY XP, filling as the character is
+    // practised correctly in later sets and draining on wrong answers.
     const state = (char: string): CharState => ({
         revealed: unlocked.has(char),
-        pct: 0,
+        pct: masteryPct(mastery.get(char) ?? 0),
     });
 
     // Kanji has no canonical table, so its slots are whatever the course teaches.

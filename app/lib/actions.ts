@@ -4,6 +4,12 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
+import { getCourseIdForLesson, getUnlockedCharacters } from './progress'
+import { XP_CORRECT, XP_WRONG, clampXp } from './mastery'
+
+/** One graded exercise in a set: the character it practised and whether it was
+ *  answered right. Traces are always right (you retry until the stroke lands). */
+export type SetResult = { character: string; correct: boolean }
 
 export async function signUp(formData: FormData) {
   const email = formData.get('email') as string
@@ -63,6 +69,7 @@ export async function resetProgress() {
   // set_completions has no delete policy, and profiles has no update policy,
   // so both run through the secret key. Scoped to this user only.
   await supabaseAdmin.from('set_completions').delete().eq('user_id', userId)
+  await supabaseAdmin.from('character_mastery').delete().eq('user_id', userId)
   await supabaseAdmin.from('profiles').update({ gold: 0 }).eq('id', userId)
 
   revalidatePath('/learn', 'layout')
@@ -81,11 +88,18 @@ const GOLD_PER_SET = 5
  * Records one finished set. A lesson is only complete once every one of its
  * sets has been recorded — that is what unlocks the next lesson.
  */
-export async function completeSet(lessonId: number, setNumber: number) {
+export async function completeSet(lessonId: number, setNumber: number, results: SetResult[] = []) {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const userId = data?.claims.sub
   if (!userId) return
+
+  // Which characters are already unlocked BEFORE this completion. Computed now,
+  // ahead of the insert below, so a character's own unlocking set never pays —
+  // only sets completed after it do. On a replay the set is already recorded,
+  // so its characters count as unlocked and earn again (up to the cap).
+  const courseId = await getCourseIdForLesson(lessonId)
+  const unlockedBefore = courseId ? await getUnlockedCharacters(courseId) : new Set<string>()
 
   // ignoreDuplicates makes this ON CONFLICT DO NOTHING, so replaying a set
   // is recorded harmlessly. It needs only the insert policy — a real upsert
@@ -129,6 +143,34 @@ export async function completeSet(lessonId: number, setNumber: number) {
     p_user_id: userId,
     p_amount: GOLD_PER_SET,
   })
+
+  // Grant/drain mastery XP for the characters this set practised, but only the
+  // ones unlocked before it — so the just-introduced kana only unlocks, and its
+  // review appearances in later sets are what build mastery. Correct traces and
+  // typings add XP; wrong typings subtract it. Clamped to [0, cap] on the user's
+  // own rows — mastery is not currency, so no secret-key guard is needed.
+  const deltas = new Map<string, number>()
+  for (const r of results) {
+    if (!unlockedBefore.has(r.character)) continue
+    deltas.set(r.character, (deltas.get(r.character) ?? 0) + (r.correct ? XP_CORRECT : -XP_WRONG))
+  }
+
+  if (deltas.size > 0) {
+    const chars = [...deltas.keys()]
+    const { data: current } = await supabase
+      .from('character_mastery')
+      .select('character, xp')
+      .in('character', chars)
+    const currentXp = new Map((current ?? []).map((m) => [m.character, m.xp]))
+
+    const rows = chars.map((character) => ({
+      user_id: userId,
+      character,
+      xp: clampXp((currentXp.get(character) ?? 0) + deltas.get(character)!),
+      updated_at: new Date().toISOString(),
+    }))
+    await supabase.from('character_mastery').upsert(rows, { onConflict: 'user_id,character' })
+  }
 
   // The gold counter lives in the learn layout's top bar, and the star map
   // needs to reflect the new progress.

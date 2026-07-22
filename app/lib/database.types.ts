@@ -39,6 +39,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      character_mastery: {
+        Row: {
+          character: string
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          character: string
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          character?: string
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           blurb: string | null

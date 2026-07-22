@@ -57,6 +57,11 @@ export default function LessonPlayer(props: {
     const [typedBlank, setTypedBlank] = useState(true);
     const advanceButtonRef = useRef<HTMLButtonElement>(null);
 
+    // Per-character results for this set, accumulated as each exercise is
+    // finished and handed to completeSet so it can move mastery XP. A ref, not
+    // state — it feeds a one-off call, and shouldn't trigger re-renders.
+    const resultsRef = useRef<{ character: string; correct: boolean }[]>([]);
+
     // The typing field reports both whether it matches and its current value,
     // so Check can be blocked while the box is empty.
     const onTyped = useCallback((correct: boolean, value: string) => {
@@ -94,7 +99,7 @@ export default function LessonPlayer(props: {
         if (!finished || preview) return;
 
         let cancelled = false;
-        completeSet(lessonId, setNumber).then((result) => {
+        completeSet(lessonId, setNumber, resultsRef.current).then((result) => {
             if (!cancelled && result) setReward(result);
         });
 
@@ -120,16 +125,23 @@ export default function LessonPlayer(props: {
 
     function advance() {
         if (isQuestion && !checked) {
-            if (selected === content.answer) setScore((score) => score + 1);
+            const right = selected === content.answer;
+            if (right) setScore((score) => score + 1);
+            resultsRef.current.push({ character: content.answer ?? "", correct: right });
             setChecked(true);
             return;
         }
 
         if (isTyping && !checked) {
             if (typedCorrect) setScore((score) => score + 1);
+            resultsRef.current.push({ character: content.answer ?? "", correct: typedCorrect });
             setChecked(true);
             return;
         }
+
+        // A trace is only advanced past once drawn correctly, so it always
+        // counts as right.
+        if (isTrace) resultsRef.current.push({ character: content.character ?? "", correct: true });
 
         setSelected(null);
         setChecked(false);
