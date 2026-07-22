@@ -34,9 +34,9 @@ _Your first ten characters — the vowels and the K row._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
-| 1 | あいうえお | 5 | 32 | 84,168 |
-| 2 | かきくけこ | 5 | 32 | 74,140 |
-| 3 | さしすせそ | 5 | 32 | 50,150 |
+| 1 | あいうえお | 5 | 19 | 84,168 |
+| 2 | かきくけこ | 5 | 19 | 74,140 |
+| 3 | さしすせそ | 5 | 19 | 50,150 |
 | 4 | え | 0 | 0 | 38,120 |
 | 5 | お | 0 | 0 | 34,92 |
 | 6 | か | 0 | 0 | 28,64 |
@@ -50,170 +50,131 @@ _a i u e o_
 
 **Set 1** &nbsp; `[set:1.1]`
 
-- `[item:375]` **lecture** — Japanese is written with three sets of characters, mixed together in the same sentence.
+- `[item:534]` **lecture** — Japanese mixes three sets of characters — ひらがな, カタカナ, and 漢字 — but you start with ひらがな, the sound-by-sound base the whole language is written on.
 
-ひらがな — the phonetic base. Every sound in the language has one, and it writes native words and the grammar that holds a sentence together. You start here.
+And ひらがな itself starts right here, with five sounds: the vowels.
 
-カタカナ — the same sounds again, kept for words borrowed from other languages.
+あ, い, う, え, お — a, i, u, e, o. Say them like the a in "father", the ee in "see", the oo in "food", the e in "bed", the o in "bore".
 
-漢字 — characters taken from China that stand for meaning, not just sound. They keep long sentences short.
+These five never change, and every other character is built from them — a vowel with a consonant in front. Learn them well: the rest of the course stands on them.
 
-First you learn ひらがな, one sound at a time — seeing it, hearing it, writing it yourself.
-- `[item:390]` **trace** — あ (a), 3 strokes
-- `[item:391]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
-- `[item:392]` **trace** — あ (a), 3 strokes
-- `[item:393]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
-- `[item:394]` **trace** — あ (a), 3 strokes
+One at a time now — see each, hear it, and write it yourself.
+- `[item:535]` **trace** — あ (a), 3 strokes
+- `[item:536]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
 
 **Set 2** &nbsp; `[set:1.2]`
 
-- `[item:444]` **trace** — い (i), 2 strokes
-- `[item:445]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
-- `[item:446]` **trace** — あ (a), 3 strokes
-- `[item:447]` **trace** — い (i), 2 strokes
-- `[item:448]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
+- `[item:537]` **trace** — い (i), 2 strokes
+- `[item:538]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
+- `[item:539]` **trace** — あ (a), 3 strokes
+- `[item:540]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
 
 **Set 3** &nbsp; `[set:1.3]`
 
-- `[item:449]` **trace** — う (u), 2 strokes
-- `[item:450]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
-- `[item:451]` **trace** — い (i), 2 strokes
-- `[item:452]` **trace** — あ (a), 3 strokes
-- `[item:453]` **trace** — う (u), 2 strokes
-- `[item:454]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
+- `[item:541]` **trace** — う (u), 2 strokes
+- `[item:542]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
+- `[item:543]` **trace** — い (i), 2 strokes
+- `[item:544]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
 
 **Set 4** &nbsp; `[set:1.4]`
 
-- `[item:455]` **trace** — え (e), 2 strokes
-- `[item:456]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
-- `[item:457]` **trace** — う (u), 2 strokes
-- `[item:458]` **trace** — い (i), 2 strokes
-- `[item:459]` **trace** — あ (a), 3 strokes
-- `[item:460]` **trace** — え (e), 2 strokes
-- `[item:461]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
+- `[item:545]` **trace** — え (e), 2 strokes
+- `[item:546]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
+- `[item:547]` **trace** — う (u), 2 strokes
+- `[item:548]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
 
 **Set 5** &nbsp; `[set:1.5]`
 
-- `[item:462]` **trace** — お (o), 3 strokes
-- `[item:463]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
-- `[item:464]` **trace** — え (e), 2 strokes
-- `[item:465]` **trace** — う (u), 2 strokes
-- `[item:466]` **trace** — い (i), 2 strokes
-- `[item:467]` **trace** — あ (a), 3 strokes
-- `[item:468]` **trace** — お (o), 3 strokes
-- `[item:469]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
+- `[item:549]` **trace** — お (o), 3 strokes
+- `[item:550]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
+- `[item:551]` **trace** — え (e), 2 strokes
+- `[item:552]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
 
 ##### かきくけこ &nbsp; `[lesson:2]`
 _ka ki ku ke ko_
 
 **Set 1** &nbsp; `[set:2.1]`
 
-- `[item:470]` **lecture** — You have the five vowels. Every other hiragana is one of those vowels with a consonant in front — so once you know the vowels, each new consonant hands you five sounds at once.
+- `[item:553]` **lecture** — You have the five vowels. Every other hiragana is one of those vowels with a consonant in front — so once you know the vowels, each new consonant hands you five sounds at once.
 
 The first consonant is k. Put it before あ い う え お and you get the か row: か, き, く, け, こ — ka, ki, ku, ke, ko.
 
 The vowel never changes. The あ inside か is the same "ah" you already know; the い inside き is the same "ee". Learn the consonant, and the rest is the sound you started with.
 
 Five new characters, one new sound. Same as before — see it, hear it, write it yourself.
-- `[item:471]` **trace** — か (ka), 3 strokes
-- `[item:472]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
-- `[item:473]` **trace** — か (ka), 3 strokes
-- `[item:474]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
-- `[item:475]` **trace** — か (ka), 3 strokes
+- `[item:554]` **trace** — か (ka), 3 strokes
+- `[item:555]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
 
 **Set 2** &nbsp; `[set:2.2]`
 
-- `[item:476]` **trace** — き (ki), 4 strokes
-- `[item:477]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
-- `[item:478]` **trace** — か (ka), 3 strokes
-- `[item:479]` **trace** — き (ki), 4 strokes
-- `[item:480]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
+- `[item:556]` **trace** — き (ki), 4 strokes
+- `[item:557]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
+- `[item:558]` **trace** — か (ka), 3 strokes
+- `[item:559]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
 
 **Set 3** &nbsp; `[set:2.3]`
 
-- `[item:481]` **trace** — く (ku), 1 strokes
-- `[item:482]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
-- `[item:483]` **trace** — き (ki), 4 strokes
-- `[item:484]` **trace** — か (ka), 3 strokes
-- `[item:485]` **trace** — く (ku), 1 strokes
-- `[item:486]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
+- `[item:560]` **trace** — く (ku), 1 strokes
+- `[item:561]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
+- `[item:562]` **trace** — き (ki), 4 strokes
+- `[item:563]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
 
 **Set 4** &nbsp; `[set:2.4]`
 
-- `[item:487]` **trace** — け (ke), 3 strokes
-- `[item:488]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
-- `[item:489]` **trace** — く (ku), 1 strokes
-- `[item:490]` **trace** — き (ki), 4 strokes
-- `[item:491]` **trace** — か (ka), 3 strokes
-- `[item:492]` **trace** — け (ke), 3 strokes
-- `[item:493]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
+- `[item:564]` **trace** — け (ke), 3 strokes
+- `[item:565]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
+- `[item:566]` **trace** — く (ku), 1 strokes
+- `[item:567]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
 
 **Set 5** &nbsp; `[set:2.5]`
 
-- `[item:494]` **trace** — こ (ko), 2 strokes
-- `[item:495]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
-- `[item:496]` **trace** — け (ke), 3 strokes
-- `[item:497]` **trace** — く (ku), 1 strokes
-- `[item:498]` **trace** — き (ki), 4 strokes
-- `[item:499]` **trace** — か (ka), 3 strokes
-- `[item:500]` **trace** — こ (ko), 2 strokes
-- `[item:501]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
+- `[item:568]` **trace** — こ (ko), 2 strokes
+- `[item:569]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
+- `[item:570]` **trace** — け (ke), 3 strokes
+- `[item:571]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
 
 ##### さしすせそ &nbsp; `[lesson:3]`
 _sa shi su se so_
 
 **Set 1** &nbsp; `[set:3.1]`
 
-- `[item:502]` **lecture** — Same pattern again — one new consonant run across the same five vowels. This time it is s: さ, し, す, せ, そ.
+- `[item:572]` **lecture** — Same pattern again — one new consonant run across the same five vowels. This time it is s: さ, し, す, せ, そ.
 
 Four are exactly what you would guess — sa, su, se, so. One is not: し is "shi", not "si". Japanese has no plain "si" sound at all, so the row bends right where you would least expect it.
 
 These small exceptions are worth watching for. Most of the language is perfectly regular, but a handful of sounds shift, and し is the first one you meet. Say it "shi", like the "she" in "sheet".
 
 See it, hear it, write it yourself.
-- `[item:503]` **trace** — さ (sa), 3 strokes
-- `[item:504]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
-- `[item:505]` **trace** — さ (sa), 3 strokes
-- `[item:506]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
-- `[item:507]` **trace** — さ (sa), 3 strokes
+- `[item:573]` **trace** — さ (sa), 3 strokes
+- `[item:574]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
 
 **Set 2** &nbsp; `[set:3.2]`
 
-- `[item:508]` **trace** — し (shi), 1 strokes
-- `[item:509]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
-- `[item:510]` **trace** — さ (sa), 3 strokes
-- `[item:511]` **trace** — し (shi), 1 strokes
-- `[item:512]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
+- `[item:575]` **trace** — し (shi), 1 strokes
+- `[item:576]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
+- `[item:577]` **trace** — さ (sa), 3 strokes
+- `[item:578]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
 
 **Set 3** &nbsp; `[set:3.3]`
 
-- `[item:513]` **trace** — す (su), 2 strokes
-- `[item:514]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
-- `[item:515]` **trace** — し (shi), 1 strokes
-- `[item:516]` **trace** — さ (sa), 3 strokes
-- `[item:517]` **trace** — す (su), 2 strokes
-- `[item:518]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
+- `[item:579]` **trace** — す (su), 2 strokes
+- `[item:580]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
+- `[item:581]` **trace** — し (shi), 1 strokes
+- `[item:582]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
 
 **Set 4** &nbsp; `[set:3.4]`
 
-- `[item:519]` **trace** — せ (se), 3 strokes
-- `[item:520]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
-- `[item:521]` **trace** — す (su), 2 strokes
-- `[item:522]` **trace** — し (shi), 1 strokes
-- `[item:523]` **trace** — さ (sa), 3 strokes
-- `[item:524]` **trace** — せ (se), 3 strokes
-- `[item:525]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
+- `[item:583]` **trace** — せ (se), 3 strokes
+- `[item:584]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
+- `[item:585]` **trace** — す (su), 2 strokes
+- `[item:586]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
 
 **Set 5** &nbsp; `[set:3.5]`
 
-- `[item:526]` **trace** — そ (so), 1 strokes
-- `[item:527]` **typing** — {"audio":"そ","answer":"そ","prompt":"so"}
-- `[item:528]` **trace** — せ (se), 3 strokes
-- `[item:529]` **trace** — す (su), 2 strokes
-- `[item:530]` **trace** — し (shi), 1 strokes
-- `[item:531]` **trace** — さ (sa), 3 strokes
-- `[item:532]` **trace** — そ (so), 1 strokes
-- `[item:533]` **typing** — {"audio":"そ","answer":"そ","prompt":"so"}
+- `[item:587]` **trace** — そ (so), 1 strokes
+- `[item:588]` **typing** — {"audio":"そ","answer":"そ","prompt":"so"}
+- `[item:589]` **trace** — せ (se), 3 strokes
+- `[item:590]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
 
 ##### え &nbsp; `[lesson:4]`
 _e_
@@ -396,7 +357,7 @@ _No units yet._
 ## Totals
 
 - Sets: **15**
-- Items: **96**
+- Items: **57**
 
 ## Set types
 
