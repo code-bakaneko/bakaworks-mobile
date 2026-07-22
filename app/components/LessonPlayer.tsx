@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
@@ -54,6 +54,7 @@ export default function LessonPlayer(props: {
     const [score, setScore] = useState(0);
     const [traced, setTraced] = useState(false);
     const [typedCorrect, setTypedCorrect] = useState(false);
+    const advanceButtonRef = useRef<HTMLButtonElement>(null);
 
     const set = sets[index];
     const content = (set?.content ?? {}) as SetContent;
@@ -68,6 +69,9 @@ export default function LessonPlayer(props: {
     const finished = index >= sets.length;
     // Replaying an already-finished set never "completes the lesson".
     const lastSet = setPosition === setTotal && !isReplay;
+
+    // What darkens the footer button; Enter honours the exact same gate.
+    const advanceDisabled = (isQuestion && selected === null) || (isTrace && !traced);
 
     const [reward, setReward] = useState<{ earned: number; balance: number | null } | null>(null);
 
@@ -85,6 +89,23 @@ export default function LessonPlayer(props: {
 
         return () => { cancelled = true };
     }, [finished, preview, lessonId, setNumber]);
+
+    // Enter works the Check / Continue button, so a lesson plays from the
+    // keyboard: submit an answer, then move on. It obeys the same gate as the
+    // button, does nothing on the end screen, and steps aside when the button
+    // itself is focused so its native activation isn't doubled. No dependency
+    // array on purpose — this re-binds each render to see the latest state.
+    useEffect(() => {
+        function onKey(e: KeyboardEvent) {
+            if (e.key !== "Enter") return;
+            if (finished || advanceDisabled) return;
+            if (e.target === advanceButtonRef.current) return;
+            e.preventDefault();
+            advance();
+        }
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    });
 
     function advance() {
         if (isQuestion && !checked) {
@@ -330,11 +351,9 @@ export default function LessonPlayer(props: {
                     ) : <span />}
 
                     <button
+                        ref={advanceButtonRef}
                         onClick={advance}
-                        disabled={
-                            (isQuestion && selected === null) ||
-                            (isTrace && !traced)
-                        }
+                        disabled={advanceDisabled}
                         className="bg-brand px-10 h-12 rounded-sm font-extrabold
                             border-b-4 border-brand-dark
                             hover:border-b-0 hover:translate-y-1 transition-all hover:cursor-pointer
