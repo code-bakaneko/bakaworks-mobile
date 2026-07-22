@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Tables } from "@/app/lib/database.types";
 import AudioButton from "./AudioButton";
@@ -54,7 +54,15 @@ export default function LessonPlayer(props: {
     const [score, setScore] = useState(0);
     const [traced, setTraced] = useState(false);
     const [typedCorrect, setTypedCorrect] = useState(false);
+    const [typedBlank, setTypedBlank] = useState(true);
     const advanceButtonRef = useRef<HTMLButtonElement>(null);
+
+    // The typing field reports both whether it matches and its current value,
+    // so Check can be blocked while the box is empty.
+    const onTyped = useCallback((correct: boolean, value: string) => {
+        setTypedCorrect(correct);
+        setTypedBlank(value.trim() === "");
+    }, []);
 
     const set = sets[index];
     const content = (set?.content ?? {}) as SetContent;
@@ -71,7 +79,10 @@ export default function LessonPlayer(props: {
     const lastSet = setPosition === setTotal && !isReplay;
 
     // What darkens the footer button; Enter honours the exact same gate.
-    const advanceDisabled = (isQuestion && selected === null) || (isTrace && !traced);
+    const advanceDisabled =
+        (isQuestion && selected === null) ||
+        (isTrace && !traced) ||
+        (isTyping && !checked && typedBlank);
 
     const [reward, setReward] = useState<{ earned: number; balance: number | null } | null>(null);
 
@@ -124,6 +135,7 @@ export default function LessonPlayer(props: {
         setChecked(false);
         setTraced(false);
         setTypedCorrect(false);
+        setTypedBlank(true);
         setIndex((index) => index + 1);
     }
 
@@ -212,12 +224,12 @@ export default function LessonPlayer(props: {
                         <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
                             {lessonName}
                         </span>
-                        <p className="text-xl md:text-2xl leading-relaxed whitespace-pre-line">
-                            <SpeakableText text={content.text ?? ""} />
-                        </p>
                         <span className="text-sm text-muted">
                             Tap any Japanese to hear it.
                         </span>
+                        <p className="text-xl md:text-2xl leading-relaxed whitespace-pre-line">
+                            <SpeakableText text={content.text ?? ""} />
+                        </p>
                     </div>
                 )}
 
@@ -284,28 +296,30 @@ export default function LessonPlayer(props: {
 
                 {isTyping && (
                     <div className="flex flex-col gap-8 items-center">
-                        <div className="flex flex-col gap-3 text-center">
+                        <div className="flex flex-col gap-3 items-center text-center">
                             <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
                                 Write it
                             </span>
-                            <div className="flex items-center gap-4 justify-center">
-                                {(content.audio || content.audio_url) && (
-                                    // Keyed per item so it replays on each new
-                                    // question rather than only the first.
-                                    <AudioButton
-                                        key={set.id}
-                                        text={content.audio}
-                                        url={content.audio_url}
-                                        autoPlay />
-                                )}
-                                <p className="text-2xl md:text-3xl font-bold">{content.prompt}</p>
+                            {(content.audio || content.audio_url) && (
+                                // Above the prompt, and keyed per item so it
+                                // replays on each new question, not only the first.
+                                <AudioButton
+                                    key={set.id}
+                                    text={content.audio}
+                                    url={content.audio_url}
+                                    autoPlay />
+                            )}
+                            {/* The romaji and, beside it, the kana it spells. */}
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-3xl md:text-4xl font-bold text-brand">{content.prompt}</span>
+                                <span className="text-4xl md:text-5xl font-bold">{content.answer}</span>
                             </div>
                         </div>
                         <KanaInput
                             key={set.id}
                             answer={content.answer ?? ""}
                             checked={checked}
-                            onChange={setTypedCorrect} />
+                            onChange={onTyped} />
                     </div>
                 )}
 
