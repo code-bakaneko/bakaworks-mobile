@@ -34,7 +34,7 @@ _Your first ten characters — the vowels and the K row._
 
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
-| 1 | あ | 0 | 0 | 84,168 |
+| 1 | あいうえお | 5 | 32 | 84,168 |
 | 2 | い | 0 | 0 | 74,140 |
 | 3 | う | 0 | 0 | 50,150 |
 | 4 | え | 0 | 0 | 38,120 |
@@ -45,10 +45,63 @@ _Your first ten characters — the vowels and the K row._
 | 9 | け | 0 | 0 | 66,36 |
 | 10 | こ | 0 | 0 | 78,112 |
 
-##### あ &nbsp; `[lesson:1]`
+##### あいうえお &nbsp; `[lesson:1]`
 _a_
 
-_No content yet._
+**Set 1** &nbsp; `[set:1.1]`
+
+- `[item:375]` **lecture** — Japanese is written with three sets of characters, mixed together in the same sentence.
+
+ひらがな — the phonetic base. Every sound in the language has one, and it writes native words and the grammar that holds a sentence together. You start here.
+
+カタカナ — the same sounds again, kept for words borrowed from other languages.
+
+漢字 — characters taken from China that stand for meaning, not just sound. They keep long sentences short.
+
+First you learn ひらがな, one sound at a time — seeing it, hearing it, writing it yourself.
+- `[item:390]` **trace** — あ (a), 3 strokes
+- `[item:391]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
+- `[item:392]` **trace** — あ (a), 3 strokes
+- `[item:393]` **typing** — {"audio":"あ","answer":"あ","prompt":"a"}
+- `[item:394]` **trace** — あ (a), 3 strokes
+
+**Set 2** &nbsp; `[set:1.2]`
+
+- `[item:444]` **trace** — い (i), 2 strokes
+- `[item:445]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
+- `[item:446]` **trace** — あ (a), 3 strokes
+- `[item:447]` **trace** — い (i), 2 strokes
+- `[item:448]` **typing** — {"audio":"い","answer":"い","prompt":"i"}
+
+**Set 3** &nbsp; `[set:1.3]`
+
+- `[item:449]` **trace** — う (u), 2 strokes
+- `[item:450]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
+- `[item:451]` **trace** — い (i), 2 strokes
+- `[item:452]` **trace** — あ (a), 3 strokes
+- `[item:453]` **trace** — う (u), 2 strokes
+- `[item:454]` **typing** — {"audio":"う","answer":"う","prompt":"u"}
+
+**Set 4** &nbsp; `[set:1.4]`
+
+- `[item:455]` **trace** — え (e), 2 strokes
+- `[item:456]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
+- `[item:457]` **trace** — う (u), 2 strokes
+- `[item:458]` **trace** — い (i), 2 strokes
+- `[item:459]` **trace** — あ (a), 3 strokes
+- `[item:460]` **trace** — え (e), 2 strokes
+- `[item:461]` **typing** — {"audio":"え","answer":"え","prompt":"e"}
+
+**Set 5** &nbsp; `[set:1.5]`
+
+- `[item:462]` **trace** — お (o), 3 strokes
+- `[item:463]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
+- `[item:464]` **trace** — え (e), 2 strokes
+- `[item:465]` **trace** — う (u), 2 strokes
+- `[item:466]` **trace** — い (i), 2 strokes
+- `[item:467]` **trace** — あ (a), 3 strokes
+- `[item:468]` **trace** — お (o), 3 strokes
+- `[item:469]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
 
 ##### い &nbsp; `[lesson:2]`
 _i_
@@ -240,8 +293,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **0**
-- Items: **0**
+- Sets: **5**
+- Items: **32**
 
 ## Set types
 

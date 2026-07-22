@@ -191,7 +191,7 @@ export default function LessonPlayer(props: {
                         <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold">
                             {lessonName}
                         </span>
-                        <p className="text-xl md:text-2xl leading-relaxed">
+                        <p className="text-xl md:text-2xl leading-relaxed whitespace-pre-line">
                             <SpeakableText text={content.text ?? ""} />
                         </p>
                         <span className="text-sm text-muted">
