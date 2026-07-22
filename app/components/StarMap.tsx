@@ -78,8 +78,19 @@ export default function StarMap({ lessons }: { lessons: MapLesson[] }) {
                     const fromColor = `color-mix(in srgb, var(--brand) ${fromFraction * 100}%, #ffffff)`;
                     const toColor = `color-mix(in srgb, var(--brand) ${toFraction * 100}%, #ffffff)`;
 
-                    const length = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
                     const gradientId = `path-${prev.id}-${lesson.id}`;
+
+                    // Pull both ends back from the star centres along the line's
+                    // own direction, so a segment starts just outside the star it
+                    // leaves instead of under it. `length` is the drawn span that
+                    // remains after the two insets.
+                    const span = Math.hypot(lesson.x - prev.x, lesson.y - prev.y);
+                    const ux = (lesson.x - prev.x) / span;
+                    const uy = (lesson.y - prev.y) / span;
+                    const off = Math.min(5, span / 2 - 1);
+                    const ax = prev.x + ux * off, ay = prev.y + uy * off;
+                    const bx = lesson.x - ux * off, by = lesson.y - uy * off;
+                    const length = span - 2 * off;
 
                     // One chunk per set, so the path shows how many sets the
                     // lesson has and how many are done.
@@ -93,10 +104,10 @@ export default function StarMap({ lessons }: { lessons: MapLesson[] }) {
                         const t1 = (startAt + chunkLength) / length;
                         return {
                             lit: k < prev.done,
-                            x1: prev.x + (lesson.x - prev.x) * t0,
-                            y1: prev.y + (lesson.y - prev.y) * t0,
-                            x2: prev.x + (lesson.x - prev.x) * t1,
-                            y2: prev.y + (lesson.y - prev.y) * t1,
+                            x1: ax + (bx - ax) * t0,
+                            y1: ay + (by - ay) * t0,
+                            x2: ax + (bx - ax) * t1,
+                            y2: ay + (by - ay) * t1,
                         };
                     });
 
@@ -114,7 +125,7 @@ export default function StarMap({ lessons }: { lessons: MapLesson[] }) {
 
                             {fromDone ? (
                                 <line
-                                    x1={prev.x} y1={prev.y} x2={lesson.x} y2={lesson.y}
+                                    x1={ax} y1={ay} x2={bx} y2={by}
                                     strokeWidth="1.6" strokeLinecap="round"
                                     stroke={`url(#${gradientId})`} />
                             ) : (
