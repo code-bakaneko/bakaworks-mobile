@@ -119,7 +119,8 @@ function Known({ slot }: { slot: Slot }) {
                 {slot.romaji}
             </span>
 
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-800/80">
+            {/* Mastery bar — empty until the mastery system fills it. */}
+            <div className="absolute inset-x-0 bottom-0 h-1.5 bg-slate-700">
                 <div className="h-full bg-brand transition-all" style={{ width: `${slot.pct}%` }} />
             </div>
         </div>

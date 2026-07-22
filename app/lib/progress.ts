@@ -73,6 +73,61 @@ export async function getCourseProgress(courseId: number): Promise<CourseProgres
     return { progress, unlocked, guides };
 }
 
+export type CharacterProgress = {
+    /** Every character the course teaches at all, whether reached yet or not. */
+    taught: Set<string>;
+    /** Characters a completed set has practiced — unlocked on the collection. */
+    unlocked: Set<string>;
+};
+
+/**
+ * Which characters the learner has unlocked, worked out from what each set
+ * actually contains rather than from lesson names — a set teaches the kana in
+ * its trace `character` and typing `answer` fields. A character unlocks the
+ * moment the first set that practiced it is complete, so a kana can reveal
+ * mid-lesson, before the whole row is done.
+ *
+ * Derived from `set_completions`, the same source as lesson progress, so there
+ * is no separate store to drift. When the mastery system lands, `unlocked`
+ * becomes a mastery threshold instead — the collection page reads this and does
+ * not change shape.
+ */
+export async function getCharacterProgress(courseId: number): Promise<CharacterProgress> {
+    const supabase = await createClient();
+
+    const { data: units } = await supabase
+        .from("units")
+        .select("id, lessons!inner(id, lesson_sets!inner(set_number, type, content))")
+        .eq("course_id", courseId);
+
+    const { data: completions } = await supabase
+        .from("set_completions")
+        .select("lesson_id, set_number");
+
+    const doneSets = new Set(completions?.map((c) => `${c.lesson_id}:${c.set_number}`));
+
+    const taught = new Set<string>();
+    const unlocked = new Set<string>();
+
+    for (const unit of units ?? []) {
+        for (const lesson of unit.lessons) {
+            for (const item of lesson.lesson_sets) {
+                const content = (item.content ?? {}) as { character?: string; answer?: string };
+                const char =
+                    item.type === "trace" ? content.character
+                        : item.type === "typing" ? content.answer
+                            : undefined;
+                if (!char) continue;
+
+                taught.add(char);
+                if (doneSets.has(`${lesson.id}:${item.set_number}`)) unlocked.add(char);
+            }
+        }
+    }
+
+    return { taught, unlocked };
+}
+
 /** The course a lesson belongs to, via its unit. */
 export async function getCourseIdForLesson(lessonId: number): Promise<number | null> {
     const supabase = await createClient();
