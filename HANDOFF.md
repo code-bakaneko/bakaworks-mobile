@@ -1,4 +1,4 @@
-# Handoff — 2026-07-21 (mid-restructure)
+# Handoff — 2026-07-22 (base hiragana authored)
 
 ## How I work with Claude (read this first)
 
@@ -7,9 +7,10 @@
   Slime* — terse, tagged statements, calls me "Master". Tag words in **romaji or hiragana,
   never kanji** ("houkoku." not "報告").
 - Keep explanations short. Lead with the answer.
-- **Every Japanese string must go through a file**, never inline in a shell command —
-  Windows mangles UTF-8 in argv and it silently stores as `?`. Use
-  `curl --data-binary "@file.json" -H "Content-Type: application/json; charset=utf-8"`.
+- **Never put a Japanese string on a shell argument** — Windows mangles UTF-8 in argv and
+  it silently stores as `?`. Author content through a **Node script** instead (see the
+  authoring tooling below): it builds the JSON in memory and sends a UTF-8 `fetch` body, so
+  nothing rides on argv. For one-off curl, use `--data-binary "@file.json"`.
 - Verify with `npx tsc --noEmit` and `npm run build` before saying something works.
 
 ## What this is
@@ -17,15 +18,23 @@
 A Duolingo-style Japanese learning app. Next.js 16 (App Router) + Supabase + Tailwind v4.
 Branch: `dev`. Repo: `code-bakaneko/bakaworks-mobile`.
 
-## RESTRUCTURE IN PROGRESS — read before authoring anything
+## RESTRUCTURE — read before authoring anything
 
-The course is being rebuilt around a new learning model. The old "one kana per
-lesson, fixed sets" content has been **CLEARED** — `lesson_sets` emptied (167→0)
-and `set_completions` cleared (3→0). The schools/subjects/courses scaffold, the
-3 units, and all **20 lesson "stars" (their cat-constellation `x,y`) were kept
-on purpose** — the map renders empty stars until content is re-authored. Much of
-the detail below this section still describes the OLD structure; treat it as
-reference for how the machinery works, not as the current content.
+The course was rebuilt around a new learning model (below). The old "one kana per
+lesson" content was cleared; the base hiragana is now **re-authored** in the new shape.
+
+### Unit plan (set 2026-07-22, "planned as we go" past unit 4)
+
+1. **Hiragana** — all 46 base kana, one cat constellation, **one star per gojūon
+   chart row** (あ か さ た な は ま や ら わ, ん folded into the わ star). **Authored:
+   lessons 1–10 all live.**
+2. **Words** — Phase 2 engine begins, using the base hiragana. *(empty; author next)*
+3. **Katakana.** *(empty)*
+4. **Words with katakana**, then **5. rest of hiragana** (dakuten + yōon), **6. using it**,
+   **7. rest of katakana**, … — stubbed, authored later.
+
+Units 2 and 3 exist and are renamed but empty (their stars don't render until they hold
+sets). The `!inner` joins in `learn/page.tsx` and `progress.ts` hide empty units/lessons.
 
 ### The model we're building toward
 
@@ -54,30 +63,57 @@ reference for how the machinery works, not as the current content.
   settle and stop appearing, hard ones keep surfacing until learned. This is what
   stops pointless repetition.
 
-### Still open — decide before authoring lesson 1
+### Decided (2026-07-22) — the four that gated authoring
 
-- Katakana front-loaded (it's Unit 3 now) vs deferred out of the opening wall.
-- Word display: kanji+furigana vs kana vs romaji-then-wean.
-- Does a wrong answer demote the debt, or just fail to pay it down?
-- Does typing a word also credit its characters, or the word alone?
+- **Katakana is deferred** past the hiragana opening — it stays its own trailing
+  unit. A `position` column now exists on `units`/`lessons` (backfilled from id
+  order), so reordering is an UPDATE, not an id renumber.
+- **Word display: kana now, furigana later.** Words are authored in kana; romaji
+  stays only as the typing *input* prompt, weaned. Furigana rendering is built
+  when the first kanji word is authored — see the build-later marker below.
+- **A wrong answer demotes, but gently.** `XP_WRONG` is `4` vs `XP_CORRECT` `10`
+  in `app/lib/mastery.ts` — a slip stings without erasing a whole rep.
+- **Typing a word credits the word alone.** Characters earn from traces and
+  single-character typing; the word earns as its own row. The character
+  collection filters to single-codepoint via `isCharacter` in
+  `app/lib/progress.ts`; `getUnlockedCharacters` deliberately keeps words in
+  because it doubles as the mastery-crediting gate.
+
+### Build later — decided, but wait for the triggering content
+
+- **Furigana rendering + a bigger kanji reading map** — build when the first
+  kanji *word* enters content, not before. A ruby/`<rt>` component plus growing
+  the map in `app/lib/romaji.ts` (today it holds ~12 kanji).
+- **A word-mastery display surface** — a "words" view reading the multi-codepoint
+  rows from `character_mastery`. Crediting already works (word-alone) through the
+  existing pipeline; only the display is missing. Build it when word items are
+  first authored.
 
 ### Done so far
 
-- Content cleared (above). A full raw backup of the old tree was taken but the
-  old data will not be reused.
-- **Characters page rebuilt as a mystery collection** — every kana is a slot;
-  locked ones show a dashed "？" card, and a slot reveals its character + reading
-  + progress once its lesson is finished. Reveal is gated on `getCourseProgress`
-  for now — a **one-line swap** to gate on character mastery when that exists
-  (marked in `app/(learn)/characters/page.tsx`). With content cleared, every slot
-  is a mystery: the correct empty state.
+- **Characters page = a mystery collection**, tabbed by script, laid out as the gojūon
+  table. Locked kana show a "？" card; a slot reveals its character + reading + a mastery
+  bar once its lesson is done. Hovering a revealed kana shows its `XP / 100`.
+- **Mastery substrate built.** `character_mastery` table (per-user XP, RLS, no
+  SECURITY-DEFINER — it isn't currency); `completeSet` grants/drains XP for characters
+  unlocked *before* the set (so a kana's own set only unlocks; later reviews build
+  mastery); anti-cram daily diminishing returns via `set_daily_reps`. Knobs in
+  `app/lib/mastery.ts`.
+- **Base hiragana authored — lessons 1–10, Unit 1.** Each lesson = one gojūon row in the
+  "review one back" shape: Set 1 lecture + trace + type of kana₁; each later set introduces
+  the next kana (trace, type) and reviews only the one before it. 5-kana row = 5 sets / 19
+  items; the short や and わ rows = 3 sets / 11.
+- **Authoring tooling** now lives in the repo (was scratchpad-only). See below.
+- **Typing input got IME tricks + tips.** `romajiToKana` (our own converter, no OS IME, no
+  CDN) now also does `-`→ー, doubled consonant→small つ, and `x`-prefix→small kana; every
+  typing exercise shows a compact tip row (`KanaInput.tsx`).
 
 ### Next
 
-- Settle the open decisions, then author Phase 1 lesson 1 (the vowels) in the new
-  small-lesson shape.
-- Build the mastery substrate: the mastery table + a `recordAnswer(target,
-  correct)` server action (user's client, RLS) + the debt scheduler.
+- **Author Unit 2 (Words)** — the Phase 2 engine: one headline word per lesson, seeded as
+  its kana are known. Needs a word-mastery display surface (see "Build later").
+- **Build the debt scheduler** — mastery XP exists, but review is still hand-authored
+  (one-back), not the runtime debt scheduler the model calls for.
 
 ## Data model
 
@@ -105,15 +141,10 @@ adding a set recomputes who has finished rather than leaving a stale flag.
 
 ## Current content
 
-**Empty — content was cleared for the restructure (see the section up top).** The
-20 stars remain in two hiragana units plus an empty Katakana unit; `lesson_sets`
-holds nothing, so `COURSE-CONTENT.md` currently shows 0 sets / 0 items. What
-follows describes how content *was* shaped, kept as a reference for the machinery
-(set types, guides withdrawal, the notes workflow) as we re-author.
-
-The old shape, for reference: one character per lesson; **set 1** a lecture plus a
-guided trace, **set 2** six traces with guides withdrawn over the final reps,
-lesson 1 also a **set 3** with a lecture and typing.
+**Unit 1 (Hiragana) is fully authored — lessons 1–10, the whole base gojūon.** Each is one
+chart row in the "review one back" shape (see "Done so far"). Units 2 (Words) and 3
+(Katakana) exist but are empty. Run `node scripts/dump-content.js` to see the live tree in
+`COURSE-CONTENT.md`.
 
 `COURSE-CONTENT.md` is a readable dump of the live tree. **You can leave notes in it**: write a
 line starting with `>` under any `[item:42]` / `[set:3.2]` / `[lesson:3]` anchor, then run
@@ -122,8 +153,9 @@ back attached to the same anchors.
 
 ## The star map
 
-Lessons are stars laid out as a **cat constellation** per unit (unit 1 in profile, unit 2
-facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
+Lessons are stars laid out as a **cat constellation** per unit, positioned by `lessons.x` /
+`lessons.y` in a 100×200 viewBox. Unit 1's 10 stars (one per hiragana row) are the current
+cat; a fancier cat / kana-symbol redraw is deferred polish.
 
 - The path between two stars is **segmented, one chunk per set**, and lights up as sets are
   finished. A completed lesson's path collapses to one unbroken line.
@@ -193,8 +225,11 @@ facing forward), positioned by `lessons.x` / `lessons.y` in a 100×200 viewBox.
 4. **Courses are hardcoded.** `/learn` queries `course_id = 1`. The enrollment page links to
    `/learn?course=N` and nothing reads the param. There is no enrollments table, so a chosen
    course is not remembered.
-5. **26 kana still to go** — なにぬねの はひふへほ まみむめも やゆよ らりるれろ わをん.
-   Needs more stars: more units, or longer constellations.
+5. **Base hiragana is done; audio for the new kana is not baked yet.** Lessons 4–10 (た
+   through わ rows, 31 new kana) were just authored, so they currently play through the
+   browser-speech fallback. Run `node scripts/generate-audio.js` with VOICEVOX up to bake
+   the real `.wav`s, then `node scripts/dump-content.js`. Still to author: dakuten + yōon
+   hiragana (unit 5), and all katakana.
 6. **`rls_auto_enable()`** — a `SECURITY DEFINER` function that appears in no migration and
    is callable by anon. Origin unknown. Worth investigating.
 7. Leaked-password protection is off in Supabase Auth (one dashboard toggle).
@@ -223,15 +258,26 @@ uploads it to the `bakaworks` bucket and writes the URL into `content.audio_url`
 
 Lectures are deliberately excluded — see known problem 2.
 
-## Adding the next characters
+## Authoring tooling (now in the repo)
 
-1. Fetch stroke data: `https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/0XXXX.svg`
-   where XXXX is the lowercase hex codepoint (あ = 03042). Grep the `d="M..."` attributes —
-   they are already in stroke order.
-2. Pick constellation coordinates within roughly x 20–85, y 20–180.
-3. Insert lessons, then generate sets: lecture + guided trace for set 1, six traces for
-   set 2 with `guides` counting down over the final N reps where N is the stroke count.
-4. `node scripts/dump-content.js` to refresh `COURSE-CONTENT.md`.
+Two committed scripts make adding kana lessons repeatable — no more ad-hoc curl.
 
-Scratch generators used for units 1 and 2 were kept in the temp scratchpad, not the repo —
-rewrite or move them into `scripts/` if this becomes routine.
+- **`scripts/fetch-strokes.js`** — fetches KanjiVG SVGs for a list of kana, extracts the
+  ordered `<path d>` strings, and caches them in `scripts/data/strokes.json`
+  (`{ "た": { strokes, viewBox } }`). `node scripts/fetch-strokes.js` does the built-in
+  default list; pass kana as args to fetch specific ones. Merges, so it's re-runnable.
+- **`scripts/author-lesson.js`** — the `LESSONS` config maps each lesson to `{ id, unitId,
+  name, lecture, kana: [[char, romaji], …] }`. It builds the "review one back" sets, reads
+  `strokes.json`, and writes rows matching lessons 1–3 exactly (trace `{guides, romaji,
+  strokes, viewBox, character}`, typing `{audio, answer, prompt}`, lecture `{text}`; `sort`
+  is 1-based within a set). It also renames the unit/lesson and derives the lesson blurb
+  from the row's romaji. `--dry` prints without writing. Idempotent: it deletes a lesson's
+  sets before inserting, so editing the config and re-running reproduces it cleanly. Builds
+  JSON in memory and POSTs a UTF-8 `fetch` body, so Japanese never touches argv.
+
+To add the next kana: `fetch-strokes.js` for the new characters, add entries to the
+`LESSONS` config (drafting each lecture in the tone of lessons 1–3), `author-lesson.js`,
+then — on your PC with VOICEVOX — `generate-audio.js`, then `dump-content.js`.
+
+Constellation coords for new stars sit within roughly x 20–85, y 20–180. The base-hiragana
+stars (lessons 1–10) already have coordinates; new units need fresh ones.

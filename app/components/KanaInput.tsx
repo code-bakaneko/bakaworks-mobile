@@ -55,7 +55,7 @@ export default function KanaInput({
             <input
                 ref={inputRef}
                 value={raw}
-                onChange={(e) => setRaw(e.target.value.replace(/[^a-zA-Z]/g, ""))}
+                onChange={(e) => setRaw(e.target.value.replace(/[^a-zA-Z-]/g, ""))}
                 disabled={checked}
                 autoComplete="off"
                 autoCapitalize="off"
@@ -69,6 +69,17 @@ export default function KanaInput({
                     ? isCorrect ? "Correct" : `Answer: ${answer}`
                     : `Type it in romaji — it becomes kana as you go`}
             </span>
+
+            {/* The IME-style tricks, shown by example: ん needs a double n (a
+                lone one stays latin until you finish), the hyphen makes the long
+                vowel, a doubled consonant makes a small tsu, and an x-prefix
+                forces any small kana. */}
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-0.5 text-xs text-white/40">
+                <span className="font-mono"><span className="text-white/60">nn</span> → ん</span>
+                <span className="font-mono"><span className="text-white/60">-</span> → ー</span>
+                <span className="font-mono"><span className="text-white/60">tta</span> → った</span>
+                <span className="font-mono"><span className="text-white/60">xya</span> → ゃ</span>
+            </div>
         </div>
     );
 }

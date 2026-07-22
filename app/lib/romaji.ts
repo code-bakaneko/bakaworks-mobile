@@ -114,6 +114,13 @@ const TO_KANA: Record<string, string> = {
     ya: "や", yu: "ゆ", yo: "よ",
     ra: "ら", ri: "り", ru: "る", re: "れ", ro: "ろ",
     wa: "わ", wo: "を", nn: "ん",
+    "-": "ー", // the long-vowel mark, typed on the hyphen key as an IME does
+    // Small (sutegana): an "x" prefix forces the little version, the way an IME
+    // does. A small tsu also comes from doubling a consonant (った), but xtu
+    // gives a standalone one.
+    xa: "ぁ", xi: "ぃ", xu: "ぅ", xe: "ぇ", xo: "ぉ",
+    xtu: "っ", xya: "ゃ", xyu: "ゅ", xyo: "ょ", xwa: "ゎ",
+
     kya: "きゃ", kyu: "きゅ", kyo: "きょ",
     gya: "ぎゃ", gyu: "ぎゅ", gyo: "ぎょ",
     sha: "しゃ", shu: "しゅ", sho: "しょ",
