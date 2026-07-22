@@ -35,7 +35,7 @@ _Your first ten characters — the vowels and the K row._
 | Lesson | Name | Sets | Items | x,y |
 |--------|------|------|-------|-----|
 | 1 | あいうえお | 5 | 32 | 84,168 |
-| 2 | い | 0 | 0 | 74,140 |
+| 2 | かきくけこ | 5 | 32 | 74,140 |
 | 3 | う | 0 | 0 | 50,150 |
 | 4 | え | 0 | 0 | 38,120 |
 | 5 | お | 0 | 0 | 34,92 |
@@ -103,10 +103,61 @@ First you learn ひらがな, one sound at a time — seeing it, hearing it, wri
 - `[item:468]` **trace** — お (o), 3 strokes
 - `[item:469]` **typing** — {"audio":"お","answer":"お","prompt":"o"}
 
-##### い &nbsp; `[lesson:2]`
-_i_
+##### かきくけこ &nbsp; `[lesson:2]`
+_ka ki ku ke ko_
 
-_No content yet._
+**Set 1** &nbsp; `[set:2.1]`
+
+- `[item:470]` **lecture** — You have the five vowels. Every other hiragana is one of those vowels with a consonant in front — so once you know the vowels, each new consonant hands you five sounds at once.
+
+The first consonant is k. Put it before あ い う え お and you get the か row: か, き, く, け, こ — ka, ki, ku, ke, ko.
+
+The vowel never changes. The あ inside か is the same "ah" you already know; the い inside き is the same "ee". Learn the consonant, and the rest is the sound you started with.
+
+Five new characters, one new sound. Same as before — see it, hear it, write it yourself.
+- `[item:471]` **trace** — か (ka), 3 strokes
+- `[item:472]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
+- `[item:473]` **trace** — か (ka), 3 strokes
+- `[item:474]` **typing** — {"audio":"か","answer":"か","prompt":"ka"}
+- `[item:475]` **trace** — か (ka), 3 strokes
+
+**Set 2** &nbsp; `[set:2.2]`
+
+- `[item:476]` **trace** — き (ki), 4 strokes
+- `[item:477]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
+- `[item:478]` **trace** — か (ka), 3 strokes
+- `[item:479]` **trace** — き (ki), 4 strokes
+- `[item:480]` **typing** — {"audio":"き","answer":"き","prompt":"ki"}
+
+**Set 3** &nbsp; `[set:2.3]`
+
+- `[item:481]` **trace** — く (ku), 1 strokes
+- `[item:482]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
+- `[item:483]` **trace** — き (ki), 4 strokes
+- `[item:484]` **trace** — か (ka), 3 strokes
+- `[item:485]` **trace** — く (ku), 1 strokes
+- `[item:486]` **typing** — {"audio":"く","answer":"く","prompt":"ku"}
+
+**Set 4** &nbsp; `[set:2.4]`
+
+- `[item:487]` **trace** — け (ke), 3 strokes
+- `[item:488]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
+- `[item:489]` **trace** — く (ku), 1 strokes
+- `[item:490]` **trace** — き (ki), 4 strokes
+- `[item:491]` **trace** — か (ka), 3 strokes
+- `[item:492]` **trace** — け (ke), 3 strokes
+- `[item:493]` **typing** — {"audio":"け","answer":"け","prompt":"ke"}
+
+**Set 5** &nbsp; `[set:2.5]`
+
+- `[item:494]` **trace** — こ (ko), 2 strokes
+- `[item:495]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
+- `[item:496]` **trace** — け (ke), 3 strokes
+- `[item:497]` **trace** — く (ku), 1 strokes
+- `[item:498]` **trace** — き (ki), 4 strokes
+- `[item:499]` **trace** — か (ka), 3 strokes
+- `[item:500]` **trace** — こ (ko), 2 strokes
+- `[item:501]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
 
 ##### う &nbsp; `[lesson:3]`
 _u_
@@ -293,8 +344,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **5**
-- Items: **32**
+- Sets: **10**
+- Items: **64**
 
 ## Set types
 
