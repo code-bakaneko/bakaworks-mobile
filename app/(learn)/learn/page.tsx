@@ -13,7 +13,9 @@ export default async function LearnPage() {
         // unit with no playable lessons is an empty sky.
         .select("*, lessons!inner(*, lesson_sets!inner(set_number))")
         .eq("course_id", COURSE_ID)
+        .order("position")
         .order("id")
+        .order("position", { referencedTable: "lessons" })
         .order("id", { referencedTable: "lessons" });
 
     if (error) return <div className="p-10 text-muted">Could not load the course.</div>;

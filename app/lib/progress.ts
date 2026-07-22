@@ -30,7 +30,9 @@ export async function getCourseProgress(courseId: number): Promise<CourseProgres
         // read — a guide exists once a set containing a lecture is finished.
         .select("id, lessons!inner(id, lesson_sets!inner(set_number, type))")
         .eq("course_id", courseId)
+        .order("position")
         .order("id")
+        .order("position", { referencedTable: "lessons" })
         .order("id", { referencedTable: "lessons" });
 
     const { data: completions } = await supabase
@@ -82,8 +84,15 @@ export type CharacterProgress = {
     mastery: Map<string, number>;
 };
 
-/** The single character a set item practises, if any — a set teaches the kana
- *  in its trace `character` and typing `answer` fields. */
+/** A masterable item is a "character" when its text is a single codepoint and a
+ *  "word" when longer — the same codepoint-count rule that names audio files and
+ *  splits the voices. Derived, never stored. The character collection shows only
+ *  characters; words earn word-alone mastery and live on their own surface. */
+export const isCharacter = (text: string) => [...text].length === 1;
+
+/** The masterable target a set item practises, if any — the kana or word in its
+ *  trace `character` and typing `answer` fields. May be a multi-codepoint word;
+ *  callers that only want single characters filter with `isCharacter`. */
 export function itemCharacter(type: string, content: unknown): string | undefined {
     const c = (content ?? {}) as { character?: string; answer?: string };
     if (type === "trace") return c.character;
@@ -97,6 +106,10 @@ export function itemCharacter(type: string, content: unknown): string | undefine
  * first set that practiced it is complete, so a kana can reveal mid-lesson.
  * Derived from `set_completions`, the same source as lesson progress, so there
  * is nothing separate to drift.
+ *
+ * NB: this intentionally does NOT filter to single characters. It is also the
+ * gate `completeSet` uses to decide which targets may earn mastery, so words
+ * must stay in — filtering them here would silently kill word-alone crediting.
  */
 export async function getUnlockedCharacters(courseId: number): Promise<Set<string>> {
     const supabase = await createClient();
@@ -155,7 +168,9 @@ export async function getCharacterProgress(courseId: number): Promise<CharacterP
         for (const lesson of unit.lessons) {
             for (const item of lesson.lesson_sets) {
                 const char = itemCharacter(item.type, item.content);
-                if (!char) continue;
+                // Characters only: a word item earns word-alone mastery and
+                // belongs on the word surface, not in the kana grid's counts.
+                if (!char || !isCharacter(char)) continue;
 
                 taught.add(char);
                 if (doneSets.has(`${lesson.id}:${item.set_number}`)) unlocked.add(char);

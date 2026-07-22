@@ -24,6 +24,7 @@ export default async function CharactersPage() {
     const state = (char: string): CharState => ({
         revealed: unlocked.has(char),
         pct: masteryPct(mastery.get(char) ?? 0),
+        xp: mastery.get(char) ?? 0,
     });
 
     // Kanji has no canonical table, so its slots are whatever the course teaches.

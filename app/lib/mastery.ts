@@ -10,8 +10,10 @@ export const MASTERY_CAP = 100;
 /** Earned per correct trace or typing of an already-unlocked character. */
 export const XP_CORRECT = 10;
 
-/** Drained per wrong answer on an already-unlocked character. */
-export const XP_WRONG = 10;
+/** Drained per wrong answer on an already-unlocked character. Deliberately less
+ *  than XP_CORRECT: a mistake should sting without erasing a whole correct rep,
+ *  so one slip doesn't undo real progress. */
+export const XP_WRONG = 4;
 
 export const clampXp = (xp: number) => Math.max(0, Math.min(MASTERY_CAP, xp));
 

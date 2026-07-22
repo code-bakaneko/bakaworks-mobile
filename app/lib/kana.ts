@@ -118,12 +118,12 @@ export { HIRAGANA_CHART, KATAKANA_CHART };
 
 // --- the rendered shape, one slot per character with its learned state ------
 
-export type Slot = { char: string; romaji: string; revealed: boolean; pct: number };
+export type Slot = { char: string; romaji: string; revealed: boolean; pct: number; xp: number };
 export type SlotCell = Slot | null;
 export type Section = { title: string; rows: SlotCell[][] };
 export type Groups = Record<KanaScript, Section[]>;
 
-export type CharState = { revealed: boolean; pct: number };
+export type CharState = { revealed: boolean; pct: number; xp: number };
 
 /** Turn a static chart into render-ready sections, asking `state` how far along
  *  each character is. Holes stay holes. */

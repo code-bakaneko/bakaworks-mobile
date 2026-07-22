@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import type { Groups, KanaScript, Slot } from "@/app/lib/kana"
+import { MASTERY_CAP } from "@/app/lib/mastery"
 
 const TABS: { key: KanaScript; label: string }[] = [
     { key: "hiragana", label: "Hiragana" },
@@ -103,25 +104,37 @@ function Mystery() {
 }
 
 function Known({ slot }: { slot: Slot }) {
+    // Outer wrapper does NOT clip, so the hover tooltip can sit above the card;
+    // the inner card keeps overflow-hidden for its rounded edges and mastery bar.
     return (
-        <div className="group relative aspect-square rounded-sm overflow-hidden
-            bg-slate-950 ring-1 ring-inset ring-white/10
-            flex flex-col items-center justify-center gap-0.5
-            transition-all duration-200 hover:ring-brand hover:-translate-y-0.5">
+        <div className="group relative aspect-square" title={`${slot.xp} / ${MASTERY_CAP} XP`}>
+            <div className="absolute inset-0 rounded-sm overflow-hidden
+                bg-slate-950 ring-1 ring-inset ring-white/10
+                flex flex-col items-center justify-center gap-0.5
+                transition-all duration-200 group-hover:ring-brand group-hover:-translate-y-0.5">
 
-            {/* Combos are two characters wide, so they run a step smaller. */}
-            <span className={`leading-none ${slot.char.length > 1
-                ? "text-xl sm:text-2xl"
-                : "text-3xl sm:text-4xl"}`}>
-                {slot.char}
-            </span>
-            <span className="max-w-full truncate px-1 text-xs sm:text-sm leading-none text-muted">
-                {slot.romaji}
-            </span>
+                {/* Combos are two characters wide, so they run a step smaller. */}
+                <span className={`leading-none ${slot.char.length > 1
+                    ? "text-xl sm:text-2xl"
+                    : "text-3xl sm:text-4xl"}`}>
+                    {slot.char}
+                </span>
+                <span className="max-w-full truncate px-1 text-xs sm:text-sm leading-none text-muted">
+                    {slot.romaji}
+                </span>
 
-            {/* Mastery bar — empty until the mastery system fills it. */}
-            <div className="absolute inset-x-0 bottom-0 h-1.5 bg-slate-700">
-                <div className="h-full bg-brand transition-all" style={{ width: `${slot.pct}%` }} />
+                {/* Mastery bar — fills with XP, drains on wrong answers. */}
+                <div className="absolute inset-x-0 bottom-0 h-1.5 bg-slate-700">
+                    <div className="h-full bg-brand transition-all" style={{ width: `${slot.pct}%` }} />
+                </div>
+            </div>
+
+            {/* Hover reveals the exact mastery: earned XP out of the cap. */}
+            <div className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2
+                whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5
+                text-[10px] font-bold text-white ring-1 ring-white/15
+                opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                {slot.xp} / {MASTERY_CAP} XP
             </div>
         </div>
     );

@@ -166,6 +166,7 @@ export type Database = {
           created_at: string | null
           id: number
           name: string
+          position: number
           unit_id: number
           x: number
           y: number
@@ -175,6 +176,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           name: string
+          position?: number
           unit_id: number
           x?: number
           y?: number
@@ -184,6 +186,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           name?: string
+          position?: number
           unit_id?: number
           x?: number
           y?: number
@@ -340,6 +343,7 @@ export type Database = {
           created_at: string | null
           id: number
           name: string
+          position: number
         }
         Insert: {
           blurb?: string | null
@@ -347,6 +351,7 @@ export type Database = {
           created_at?: string | null
           id?: never
           name: string
+          position?: number
         }
         Update: {
           blurb?: string | null
@@ -354,6 +359,7 @@ export type Database = {
           created_at?: string | null
           id?: never
           name?: string
+          position?: number
         }
         Relationships: [
           {

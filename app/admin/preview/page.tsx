@@ -18,14 +18,16 @@ export default async function AdminPreviewPage() {
     const { data: units, error } = await supabase
         .from("units")
         .select("id, name, lessons(id, name, blurb, lesson_sets(set_number, type))")
+        .order("position")
         .order("id")
+        .order("position", { referencedTable: "lessons" })
         .order("id", { referencedTable: "lessons" });
 
     if (error) return <div className="p-10 text-muted">Could not load the course.</div>;
 
     // The full canonical set, every slot revealed — a reference of every
     // character the collection covers, laid out as the gojūon table.
-    const revealed = () => ({ revealed: true, pct: 0 });
+    const revealed = () => ({ revealed: true, pct: 0, xp: 0 });
     const fullSet: Groups = {
         hiragana: buildSections(HIRAGANA_CHART, revealed),
         katakana: buildSections(KATAKANA_CHART, revealed),
