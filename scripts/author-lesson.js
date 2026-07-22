@@ -55,8 +55,47 @@ const UNIT_META = {
     2: { name: "Words", blurb: "Your first real words, built from the hiragana you now know." },
 };
 
-// k = [kana, romaji]. Lessons 1-3 (あ/か/さ rows) already live in the DB.
+// The lecture text for lessons 1-3, kept verbatim from the original authoring.
+const LEC1 = `Japanese mixes three sets of characters — ひらがな, カタカナ, and 漢字 — but you start with ひらがな, the sound-by-sound base the whole language is written on.
+
+And ひらがな itself starts right here, with five sounds: the vowels.
+
+あ, い, う, え, お — a, i, u, e, o. Say them like the a in "father", the ee in "see", the oo in "food", the e in "bed", the o in "bore".
+
+These five never change, and every other character is built from them — a vowel with a consonant in front. Learn them well: the rest of the course stands on them.
+
+One at a time now — see each, hear it, and write it yourself.`;
+
+const LEC2 = `You have the five vowels. Every other hiragana is one of those vowels with a consonant in front — so once you know the vowels, each new consonant hands you five sounds at once.
+
+The first consonant is k. Put it before あ い う え お and you get the か row: か, き, く, け, こ — ka, ki, ku, ke, ko.
+
+The vowel never changes. The あ inside か is the same "ah" you already know; the い inside き is the same "ee". Learn the consonant, and the rest is the sound you started with.
+
+Five new characters, one new sound. Same as before — see it, hear it, write it yourself.`;
+
+const LEC3 = `Same pattern again — one new consonant run across the same five vowels. This time it is s: さ, し, す, せ, そ.
+
+Four are exactly what you would guess — sa, su, se, so. One is not: し is "shi", not "si". Japanese has no plain "si" sound at all, so the row bends right where you would least expect it.
+
+These small exceptions are worth watching for. Most of the language is perfectly regular, but a handful of sounds shift, and し is the first one you meet. Say it "shi", like the "she" in "sheet".
+
+See it, hear it, write it yourself.`;
+
+// k = [kana, romaji]. Lessons 1-3 reuse their original lectures (above).
 const LESSONS = [
+    {
+        id: 1, unitId: 1, name: "あいうえお", lecture: LEC1,
+        kana: [["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"]],
+    },
+    {
+        id: 2, unitId: 1, name: "かきくけこ", lecture: LEC2,
+        kana: [["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"]],
+    },
+    {
+        id: 3, unitId: 1, name: "さしすせそ", lecture: LEC3,
+        kana: [["さ", "sa"], ["し", "shi"], ["す", "su"], ["せ", "se"], ["そ", "so"]],
+    },
     {
         id: 4, unitId: 1, name: "たちつてと",
         lecture:
@@ -142,24 +181,31 @@ function traceContent([char, romaji]) {
 }
 const typingContent = ([char, romaji]) => ({ audio: char, answer: char, prompt: romaji });
 
-/** The review-one-back rows for one lesson, ordered by set then sort. */
+/**
+ * The rows for one lesson, ordered by set then sort. Tracing is minimized for
+ * the web (a mouse is clumsy): a kana is traced once, in set 1, then drilled by
+ * typing. Set 1 introduces the whole row (lecture, trace all, type all); sets 2
+ * and 3 type the two halves; set 4 types everything. No set 5.
+ */
 function rowsFor(lesson) {
+    const k = lesson.kana;
     const rows = [];
-    lesson.kana.forEach((k, i) => {
-        const setNumber = i + 1;
-        if (i === 0) {
-            rows.push({ set_number: 1, sort: 1, type: "lecture", content: { text: lesson.lecture } });
-            rows.push({ set_number: 1, sort: 2, type: "trace", content: traceContent(k) });
-            rows.push({ set_number: 1, sort: 3, type: "typing", content: typingContent(k) });
-        } else {
-            const prev = lesson.kana[i - 1];
-            rows.push({ set_number: setNumber, sort: 1, type: "trace", content: traceContent(k) });
-            rows.push({ set_number: setNumber, sort: 2, type: "typing", content: typingContent(k) });
-            rows.push({ set_number: setNumber, sort: 3, type: "trace", content: traceContent(prev) });
-            rows.push({ set_number: setNumber, sort: 4, type: "typing", content: typingContent(prev) });
-        }
-    });
-    return rows.map((r) => ({ lesson_id: lesson.id, ...r }));
+    const push = (setNumber, type, content) =>
+        rows.push({ lesson_id: lesson.id, set_number: setNumber, type, content });
+
+    // Set 1 — lecture, then trace every kana once, then type every kana. This
+    // is the only place tracing lives; on a repeat the runtime skips it.
+    push(1, "lecture", { text: lesson.lecture });
+    for (const kk of k) push(1, "trace", traceContent(kk));
+    for (const kk of k) push(1, "typing", typingContent(kk));
+
+    // Set 2 — type the whole row. Repeats and cross-lesson review are generated
+    // dynamically at runtime (the debt scheduler), not authored here.
+    for (const kk of k) push(2, "typing", typingContent(kk));
+
+    // sort is 1-based within each set, in the order rows were pushed.
+    const nextSort = {};
+    return rows.map((r) => ({ ...r, sort: (nextSort[r.set_number] = (nextSort[r.set_number] ?? 0) + 1) }));
 }
 
 // --- run -------------------------------------------------------------------
@@ -169,7 +215,7 @@ async function main() {
 
     for (const lesson of LESSONS) {
         const rows = rowsFor(lesson);
-        const sets = lesson.kana.length;
+        const sets = new Set(rows.map((r) => r.set_number)).size;
         console.log(`Lesson ${lesson.id} "${lesson.name}" — ${sets} set(s), ${rows.length} item(s)`);
         if (dry) continue;
 
