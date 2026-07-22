@@ -269,6 +269,38 @@ export type Database = {
           },
         ]
       }
+      set_daily_reps: {
+        Row: {
+          day: string
+          lesson_id: number
+          reps: number
+          set_number: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          lesson_id: number
+          reps?: number
+          set_number: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          lesson_id?: number
+          reps?: number
+          set_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "set_daily_reps_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subjects: {
         Row: {
           blurb: string | null

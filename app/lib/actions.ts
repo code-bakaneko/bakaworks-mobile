@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
 import { getCourseIdForLesson, getUnlockedCharacters } from './progress'
-import { XP_CORRECT, XP_WRONG, clampXp } from './mastery'
+import { XP_CORRECT, XP_WRONG, clampXp, dailyGainMultiplier } from './mastery'
 
 /** One graded exercise in a set: the character it practised and whether it was
  *  answered right. Traces are always right (you retry until the stroke lands). */
@@ -70,6 +70,7 @@ export async function resetProgress() {
   // so both run through the secret key. Scoped to this user only.
   await supabaseAdmin.from('set_completions').delete().eq('user_id', userId)
   await supabaseAdmin.from('character_mastery').delete().eq('user_id', userId)
+  await supabaseAdmin.from('set_daily_reps').delete().eq('user_id', userId)
   await supabaseAdmin.from('profiles').update({ gold: 0 }).eq('id', userId)
 
   revalidatePath('/learn', 'layout')
@@ -149,27 +150,56 @@ export async function completeSet(lessonId: number, setNumber: number, results: 
   // review appearances in later sets are what build mastery. Correct traces and
   // typings add XP; wrong typings subtract it. Clamped to [0, cap] on the user's
   // own rows — mastery is not currency, so no secret-key guard is needed.
-  const deltas = new Map<string, number>()
+  // Split into gains (correct) and drains (wrong), so the daily
+  // diminishing-returns multiplier applies only to the gains.
+  const gains = new Map<string, number>()
+  const drains = new Map<string, number>()
   for (const r of results) {
     if (!unlockedBefore.has(r.character)) continue
-    deltas.set(r.character, (deltas.get(r.character) ?? 0) + (r.correct ? XP_CORRECT : -XP_WRONG))
+    if (r.correct) gains.set(r.character, (gains.get(r.character) ?? 0) + XP_CORRECT)
+    else drains.set(r.character, (drains.get(r.character) ?? 0) + XP_WRONG)
   }
 
-  if (deltas.size > 0) {
-    const chars = [...deltas.keys()]
+  const affected = new Set([...gains.keys(), ...drains.keys()])
+  if (affected.size > 0) {
+    // How many times this set was already completed today. The more, the less
+    // its correct answers pay — cramming does not consolidate — resetting at
+    // midnight (UTC) so returning another day pays full again.
+    const day = new Date().toISOString().slice(0, 10)
+    const { data: repRow } = await supabase
+      .from('set_daily_reps')
+      .select('reps')
+      .match({ user_id: userId, lesson_id: lessonId, set_number: setNumber, day })
+      .maybeSingle()
+    const repsToday = repRow?.reps ?? 0
+    const gainMult = dailyGainMultiplier(repsToday)
+
+    const chars = [...affected]
     const { data: current } = await supabase
       .from('character_mastery')
       .select('character, xp')
       .in('character', chars)
     const currentXp = new Map((current ?? []).map((m) => [m.character, m.xp]))
 
-    const rows = chars.map((character) => ({
-      user_id: userId,
-      character,
-      xp: clampXp((currentXp.get(character) ?? 0) + deltas.get(character)!),
-      updated_at: new Date().toISOString(),
-    }))
+    const rows = chars.map((character) => {
+      const rawGain = gains.get(character) ?? 0
+      // A degraded gain still worth at least 1, so practice always nudges up.
+      const gain = rawGain > 0 ? Math.max(1, Math.round(rawGain * gainMult)) : 0
+      const drain = drains.get(character) ?? 0
+      return {
+        user_id: userId,
+        character,
+        xp: clampXp((currentXp.get(character) ?? 0) + gain - drain),
+        updated_at: new Date().toISOString(),
+      }
+    })
     await supabase.from('character_mastery').upsert(rows, { onConflict: 'user_id,character' })
+
+    // Count this completion toward today's diminishing returns.
+    await supabase.from('set_daily_reps').upsert(
+      { user_id: userId, lesson_id: lessonId, set_number: setNumber, day, reps: repsToday + 1 },
+      { onConflict: 'user_id,lesson_id,set_number,day' }
+    )
   }
 
   // The gold counter lives in the learn layout's top bar, and the star map
