@@ -141,24 +141,16 @@ export default function KanaTracer({
                 tappable since autoplay can be blocked. */}
             <div className="flex items-center gap-4">
                 <AudioButton text={audio ?? character} autoPlay />
-                {fromMemory && (
-                    <div className="flex flex-col">
-                        <span className="text-5xl font-bold leading-none">{character}</span>
-                        <span className="text-xs uppercase tracking-[0.2em] text-brand font-bold mt-1">
-                            From memory
-                        </span>
-                    </div>
-                )}
             </div>
 
-            <div className="flex items-center gap-3 text-sm">
-                <span className="text-muted">
-                    {done ? "Complete" : `Stroke ${strokeIndex + 1} of ${strokes.length}`}
-                </span>
-                {romaji && <span className="text-brand font-bold">{romaji}</span>}
-                {!fromMemory && guideCount < strokes.length && (
-                    <span className="text-muted">
-                        · {guideCount} guide{guideCount === 1 ? "" : "s"}
+            {/* The romaji and the kana it spells, side by side — the reference
+                for what you are drawing. */}
+            <div className="flex items-baseline gap-3">
+                {romaji && <span className="text-3xl font-bold text-brand">{romaji}</span>}
+                <span className="text-4xl font-bold leading-none">{character}</span>
+                {fromMemory && (
+                    <span className="self-center text-xs uppercase tracking-[0.2em] text-brand font-bold">
+                        From memory
                     </span>
                 )}
             </div>
@@ -232,7 +224,7 @@ export default function KanaTracer({
                 )}
                 {done && (
                     <span className="text-green-400 text-sm font-bold">
-                        {character} — all {strokes.length} strokes correct.
+                        {character} — correct.
                     </span>
                 )}
             </div>
