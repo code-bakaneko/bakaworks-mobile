@@ -36,7 +36,7 @@ _Your first ten characters — the vowels and the K row._
 |--------|------|------|-------|-----|
 | 1 | あいうえお | 5 | 32 | 84,168 |
 | 2 | かきくけこ | 5 | 32 | 74,140 |
-| 3 | う | 0 | 0 | 50,150 |
+| 3 | さしすせそ | 5 | 32 | 50,150 |
 | 4 | え | 0 | 0 | 38,120 |
 | 5 | お | 0 | 0 | 34,92 |
 | 6 | か | 0 | 0 | 28,64 |
@@ -46,7 +46,7 @@ _Your first ten characters — the vowels and the K row._
 | 10 | こ | 0 | 0 | 78,112 |
 
 ##### あいうえお &nbsp; `[lesson:1]`
-_a_
+_a i u e o_
 
 **Set 1** &nbsp; `[set:1.1]`
 
@@ -159,10 +159,61 @@ Five new characters, one new sound. Same as before — see it, hear it, write it
 - `[item:500]` **trace** — こ (ko), 2 strokes
 - `[item:501]` **typing** — {"audio":"こ","answer":"こ","prompt":"ko"}
 
-##### う &nbsp; `[lesson:3]`
-_u_
+##### さしすせそ &nbsp; `[lesson:3]`
+_sa shi su se so_
 
-_No content yet._
+**Set 1** &nbsp; `[set:3.1]`
+
+- `[item:502]` **lecture** — Same pattern again — one new consonant run across the same five vowels. This time it is s: さ, し, す, せ, そ.
+
+Four are exactly what you would guess — sa, su, se, so. One is not: し is "shi", not "si". Japanese has no plain "si" sound at all, so the row bends right where you would least expect it.
+
+These small exceptions are worth watching for. Most of the language is perfectly regular, but a handful of sounds shift, and し is the first one you meet. Say it "shi", like the "she" in "sheet".
+
+See it, hear it, write it yourself.
+- `[item:503]` **trace** — さ (sa), 3 strokes
+- `[item:504]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
+- `[item:505]` **trace** — さ (sa), 3 strokes
+- `[item:506]` **typing** — {"audio":"さ","answer":"さ","prompt":"sa"}
+- `[item:507]` **trace** — さ (sa), 3 strokes
+
+**Set 2** &nbsp; `[set:3.2]`
+
+- `[item:508]` **trace** — し (shi), 1 strokes
+- `[item:509]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
+- `[item:510]` **trace** — さ (sa), 3 strokes
+- `[item:511]` **trace** — し (shi), 1 strokes
+- `[item:512]` **typing** — {"audio":"し","answer":"し","prompt":"shi"}
+
+**Set 3** &nbsp; `[set:3.3]`
+
+- `[item:513]` **trace** — す (su), 2 strokes
+- `[item:514]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
+- `[item:515]` **trace** — し (shi), 1 strokes
+- `[item:516]` **trace** — さ (sa), 3 strokes
+- `[item:517]` **trace** — す (su), 2 strokes
+- `[item:518]` **typing** — {"audio":"す","answer":"す","prompt":"su"}
+
+**Set 4** &nbsp; `[set:3.4]`
+
+- `[item:519]` **trace** — せ (se), 3 strokes
+- `[item:520]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
+- `[item:521]` **trace** — す (su), 2 strokes
+- `[item:522]` **trace** — し (shi), 1 strokes
+- `[item:523]` **trace** — さ (sa), 3 strokes
+- `[item:524]` **trace** — せ (se), 3 strokes
+- `[item:525]` **typing** — {"audio":"せ","answer":"せ","prompt":"se"}
+
+**Set 5** &nbsp; `[set:3.5]`
+
+- `[item:526]` **trace** — そ (so), 1 strokes
+- `[item:527]` **typing** — {"audio":"そ","answer":"そ","prompt":"so"}
+- `[item:528]` **trace** — せ (se), 3 strokes
+- `[item:529]` **trace** — す (su), 2 strokes
+- `[item:530]` **trace** — し (shi), 1 strokes
+- `[item:531]` **trace** — さ (sa), 3 strokes
+- `[item:532]` **trace** — そ (so), 1 strokes
+- `[item:533]` **typing** — {"audio":"そ","answer":"そ","prompt":"so"}
 
 ##### え &nbsp; `[lesson:4]`
 _e_
@@ -344,8 +395,8 @@ _No units yet._
 
 ## Totals
 
-- Sets: **10**
-- Items: **64**
+- Sets: **15**
+- Items: **96**
 
 ## Set types
 
